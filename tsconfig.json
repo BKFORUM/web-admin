@@ -22,7 +22,7 @@
       "@pages/*": ["src/pages/*"],
       "@components/*": ["src/components/*"],
       "@interfaces/*": ["src/interfaces/*"],
-      "@constants/*": ["src/constants/*"],
+      "@commom/*": ["src/commom/*"],
       "@hooks/*": ["src/hooks/*"],
       "@layouts/*": ["src/layouts/*"],
       "@routes/*": ["src/routes/*"],
