@@ -9,6 +9,7 @@ function ProtectedRoute(props: IProps): JSX.Element {
   if (user === null) {
     return <Navigate to='/login' />
   }
+
   return props.children
 }
 

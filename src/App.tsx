@@ -5,6 +5,7 @@ import { routerAdmin } from '@routes/router'
 import Login from '@pages/Login'
 import NotFound from '@pages/NotFound'
 import ProtectedRoute from '@routes/ProtectedRoute'
+import RedirectForum from '@routes/RedirectForum'
 
 function App() {
   return (
@@ -29,7 +30,11 @@ function App() {
         </Route>
         <Route
           path='/login'
-          element={<Login />}
+          element={
+            <RedirectForum>
+              <Login />
+            </RedirectForum>
+          }
         />
         <Route
           path='*'
