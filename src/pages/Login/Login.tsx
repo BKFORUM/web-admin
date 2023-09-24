@@ -1,8 +1,6 @@
 import React, { FC } from 'react'
 import logo from '../../assets/images/logobkforum.png'
-// import bgImage from '../../assets/images/bg-1.png'
 import {
-  // Button,
   FormControl,
   IconButton,
   Input,
@@ -18,6 +16,9 @@ import { Controller } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import Button from '@components/Button/Button'
+import { useStoreActions } from 'easy-peasy'
+import { authActionSelector } from '@store/index'
+import { useNavigate } from 'react-router-dom'
 
 interface Props {}
 interface IFormInput {
@@ -36,6 +37,10 @@ const schema = yup.object().shape({
 })
 
 const Login: FC<Props> = (): JSX.Element => {
+  const navigate = useNavigate()
+  const { login } = useStoreActions(authActionSelector)
+  // const { isLoginSuccess } = useStoreState(authStateSelector)
+  const [isLoading, setIsLoading] = React.useState<boolean>(false)
   const { handleSubmit, control } = useForm<IFormInput>({
     defaultValues: defaultValues,
     resolver: yupResolver(schema),
@@ -48,7 +53,16 @@ const Login: FC<Props> = (): JSX.Element => {
     event.preventDefault()
   }
 
-  const onSubmit = (data: IFormInput) => console.log(data)
+  const onSubmit = async (data: IFormInput) => {
+    console.log(data)
+    setIsLoading(true)
+    const res = await login()
+    if (res) {
+      setIsLoading(false)
+      navigate('/')
+      console.log(res)
+    }
+  }
   return (
     <div className='min-h-screen relative'>
       <div className='min-h-screen'>
@@ -121,7 +135,9 @@ const Login: FC<Props> = (): JSX.Element => {
             </div>
             <Button
               typeButton='blue'
-              loading={true}>
+              className='mt-10'
+              disabled={isLoading}
+              loading={isLoading}>
               Đăng nhập
             </Button>
           </form>

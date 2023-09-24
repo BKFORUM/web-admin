@@ -28,7 +28,7 @@
       "@routes/*": ["src/routes/*"],
       "@services/*": ["src/@services/*"],
       "@utils/*": ["src/utils/*"],
-      "@redux/*": ["src/redux/*"]
+      "@store/*": ["src/store/*"]
     }
   },
   "include": ["src"],

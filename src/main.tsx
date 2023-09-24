@@ -3,11 +3,15 @@ import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
 import { BrowserRouter } from 'react-router-dom'
+import { StoreProvider } from 'easy-peasy'
+import store from '@store/index.ts'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <BrowserRouter>
-      <App />
+      <StoreProvider store={store}>
+        <App />
+      </StoreProvider>
     </BrowserRouter>
   </React.StrictMode>,
 )

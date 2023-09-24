@@ -1,7 +1,7 @@
 export const ROUTER = Object.freeze({
     LOGIN: '/login',
     // HOME: '/',
-    CLASSMANAGEMENT: '/class-management',
+    FORUM: '/',
     USERMANAGEMENT: '/user-management',
     POSTMANAGEMENT: '/post-management',
     EVENTMANAGEMENT: '/event-management',

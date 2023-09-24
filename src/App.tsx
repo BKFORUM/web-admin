@@ -4,6 +4,7 @@ import './App.css'
 import { routerAdmin } from '@routes/router'
 import Login from '@pages/Login'
 import NotFound from '@pages/NotFound'
+import ProtectedRoute from '@routes/ProtectedRoute'
 
 function App() {
   return (
@@ -11,7 +12,11 @@ function App() {
       <Routes>
         <Route
           path='/'
-          element={<DefaultLayout />}>
+          element={
+            <ProtectedRoute>
+              <DefaultLayout />
+            </ProtectedRoute>
+          }>
           {routerAdmin.map((route, index) => {
             return (
               <Route
