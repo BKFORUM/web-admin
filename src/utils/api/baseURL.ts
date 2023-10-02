@@ -1,4 +1,4 @@
-import IsTokenValid from "@utils/functions/isValidToken";
+// import IsTokenValid from "@utils/functions/isValidToken";
 import axios from "axios";
 
 const BaseURL = axios.create({
@@ -16,9 +16,9 @@ BaseURL.interceptors.request.use(
             user = localStorage.getItem("user");
         } catch (e) { }
 
-        if (!IsTokenValid()) {
-            console.log('token het han')
-        }
+        // if (!IsTokenValid()) {
+        //     console.log('token het han')
+        // }
 
         if (user?.access_token !== null) {
             config.headers.Authorization = `Bearer ${user?.access_token}`;

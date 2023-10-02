@@ -7,11 +7,9 @@ import { StoreProvider } from 'easy-peasy'
 import store from '@store/index.ts'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <StoreProvider store={store}>
-        <App />
-      </StoreProvider>
-    </BrowserRouter>
-  </React.StrictMode>,
+  <BrowserRouter>
+    <StoreProvider store={store}>
+      <App />
+    </StoreProvider>
+  </BrowserRouter>,
 )
