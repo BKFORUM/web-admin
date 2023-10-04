@@ -5,7 +5,7 @@ import { FC, useState } from 'react'
 import { Outlet } from 'react-router-dom'
 // import { Outlet } from 'react-router-dom'
 interface Props {
-  children: React.ReactNode
+  children?: React.ReactNode
 }
 
 const DefaultLayout: FC<Props> = (): JSX.Element => {
@@ -41,7 +41,7 @@ const DefaultLayout: FC<Props> = (): JSX.Element => {
           open={open}
           setOpen={setOpen}
         />
-        <main className='mt-20 mb-4 flex-1 bg-white rounded-3xl p-4'>
+        <main className='mt-20 mb-4 flex-1 bg-white rounded-3xl p-4 overflow-y-hidden overflow-x-hidden'>
           <div className='overflow-hidden'>
             <Outlet />
           </div>

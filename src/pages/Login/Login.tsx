@@ -10,9 +10,9 @@ import {
 } from '@mui/material'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
-import { useForm } from 'react-hook-form'
 import TextFieldCustom from '@components/TextField'
 import { Controller } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import Button from '@components/Button/Button'
@@ -87,10 +87,17 @@ const Login: FC<Props> = (): JSX.Element => {
           <form
             onSubmit={handleSubmit(onSubmit)}
             className='flex flex-col min-w-[320px] gap-4 sm:container'>
-            <TextFieldCustom
+            <Controller
               name='maSinhVien'
               control={control}
-              label='Mã sinh viên *'
+              render={({ field: { onChange, value }, fieldState: { error } }) => (
+                <TextFieldCustom
+                  error={error}
+                  onChange={onChange}
+                  value={value}
+                  label='Mã sinh viên *'
+                />
+              )}
             />
             <Controller
               name='passWord'

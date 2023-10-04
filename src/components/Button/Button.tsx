@@ -5,12 +5,10 @@ export enum TypesButton {
   'outline',
   'disabled',
   'elevated',
-  'red',
+  'reject',
   'gradient',
-  'green',
+  'approve',
   'blue',
-  'primary-50',
-  'green-50',
 }
 
 interface IButton
@@ -47,7 +45,7 @@ const Button = ({ typeButton = 'primary', loading, ...props }: IButton) =>
         }
         case TypesButton[4]: {
           result =
-            'transition-all duration-500 bg-red-400 hover:bg-red-500 text-white font-semibold py-2 px-4 border border-red-400 rounded shadow'
+            'transition-all duration-500 bg-red-400 hover:bg-red-600 text-black hover:text-white py-2 px-4 border border-red-400 rounded-2xl shadow'
           break
         }
         case TypesButton[5]: {
@@ -57,7 +55,7 @@ const Button = ({ typeButton = 'primary', loading, ...props }: IButton) =>
         }
         case TypesButton[6]: {
           result =
-            'transition-all duration-500 bg-[#004853] hover:bg-[#002b31] text-white font-semibold py-2 px-4 border border-[#004853] rounded shadow'
+            'transition-all duration-500 bg-[#A3DA8F] hover:bg-[#07ea48] text-black hover:text-white  py-2 px-4 border border-[#A3DA8F] rounded-2xl shadow'
           break
         }
         case TypesButton[7]: {
@@ -65,20 +63,10 @@ const Button = ({ typeButton = 'primary', loading, ...props }: IButton) =>
             'transition-all duration-500 bg-[#3367d6] hover:bg-[#1a55d1] text-white font-semibold py-2 px-4 border border-[#3367d6] rounded shadow'
           break
         }
-        case TypesButton[8]: {
-          result =
-            'transition-all duration-500 bg-[#D5B37680] hover:bg-[#D3AA9480] text-white font-semibold py-2 px-4 rounded shadow'
-          break
-        }
-        case TypesButton[9]: {
-          result =
-            'transition-all duration-500 bg-[#00485380] hover:bg-[#002b3180] text-white font-semibold py-2 px-4 rounded shadow'
-          break
-        }
         case TypesButton[0]:
         default: {
           result =
-            'transition-all duration-500 bg-primary-400 hover:bg-primary-400 text-white font-bold py-2 px-4 rounded hover:text-white hover:bg-primary-500 hover:ring-0 hover:border-primary-500 focus:bg-primary-500 focus:border-primary-500 focus:outline-none focus:ring-0'
+            'transition-all duration-300 bg-[#154dc5] hover:bg-[#1a55d1] text-white font-semibold py-1.5 px-6 border border-[#3367d6] rounded-2xl shadow focus:outline-none focus:ring-0'
           break
         }
       }

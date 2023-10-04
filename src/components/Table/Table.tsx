@@ -4,7 +4,6 @@ import { Box } from '@mui/material'
 interface IProps {
   columns?: any
   rows?: any
-  getRowId?: any
   loading?: boolean
   sortable?: any
   totalRow?: number
@@ -12,6 +11,7 @@ interface IProps {
   paginationModel?: any
   onSortModelChange?: (sortModel: GridSortModel) => void
   onPaginationModelChange?: any
+  setRowSelected?: any
 }
 
 const Table = ({
@@ -20,16 +20,20 @@ const Table = ({
   loading,
   sortModel,
   totalRow,
-  getRowId,
   onSortModelChange,
   paginationModel,
   onPaginationModelChange,
+  setRowSelected,
 }: IProps) => {
   return (
     <Box sx={{ mt: '8px', width: '100%', backgroundColor: '#fff' }}>
       <DataGrid
         sx={{
-          '&.MuiDataGrid-root--densityStandard .MuiDataGrid-cell': { py: '10px' },
+          '&.MuiDataGrid-root--densityStandard .MuiDataGrid-cell': {
+            py: '10px',
+            display: 'flex',
+            alignItems: 'center',
+          },
           '&.MuiDataGrid-root .MuiDataGrid-cell:focus-within': {
             outline: 'none !important',
           },
@@ -39,9 +43,9 @@ const Table = ({
           '& .MuiDataGrid-columnHeaderTitle': {
             fontWeight: 'bold',
           },
+          height: '100%',
         }}
         rows={rows}
-        getRowId={getRowId}
         columns={columns}
         rowCount={totalRow}
         loading={loading}
@@ -51,13 +55,17 @@ const Table = ({
         onSortModelChange={onSortModelChange}
         getRowHeight={() => 'auto'}
         hideFooterSelectedRowCount={true}
-        autoHeight={true}
+        autoHeight
         hideFooterPagination={false}
-        // paginationMode='server'
         pageSizeOptions={[10]}
         paginationModel={paginationModel}
-        autoPageSize
+        // paginationMode='server'
         onPaginationModelChange={onPaginationModelChange}
+        onRowSelectionModelChange={(ids) => {
+          const selectedIDs = new Set(ids)
+          const selectedRows = rows.filter((row: any) => selectedIDs.has(row.id))
+          setRowSelected(selectedRows)
+        }}
       />
     </Box>
   )
