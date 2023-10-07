@@ -55,7 +55,7 @@ const AvatarHeader: FC<Props> = (): JSX.Element => {
           onClick={() => {
             setOpen(false)
           }}
-          className={`origin-top-right absolute ltr:right-0 rtl:left-0 rounded top-full z-50 py-0.5 ltr:text-left rtl:text-right bg-white dark:bg-gray-800 border dark:border-gray-700 shadow-md`}
+          className={`origin-top-right absolute ltr:right-0 rtl:left-0 rounded top-full z-50 py-0.5 ltr:text-left rtl:text-right bg-white border shadow-md`}
           style={{ minWidth: '12rem' }}>
           <li className='relative group '>
             <a
@@ -67,7 +67,7 @@ const AvatarHeader: FC<Props> = (): JSX.Element => {
             </a>
           </li>
           <li className='relative'>
-            <hr className='border-t border-gray-200 dark:border-gray-700 my-0' />
+            <hr className='border-t border-gray-200 my-0' />
           </li>
           <li className='relative group'>
             <a

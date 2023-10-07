@@ -9,6 +9,8 @@ import { FC, useCallback, useEffect, useState } from 'react'
 import { GridRenderCellParams, GridSortModel } from '@mui/x-data-grid'
 import ModalConfirm from '@components/ModalConfirm'
 import ModalAddEdit from '@components/ModalAddEdit'
+import { useNavigate } from 'react-router-dom'
+import { Tooltip } from '@material-ui/core'
 
 interface IForum {
   id: number
@@ -43,14 +45,14 @@ const FakeData = [
   {
     id: 4,
     forum: '20TCLC_DT3',
-    moderator: 'Võ Đức Hoàng',
+    moderator: 'Lê Thị Mỹ Hạnh',
     total_members: 40,
     event: 40,
   },
   {
     id: 5,
     forum: '20TCLC_DT3',
-    moderator: 'Võ Đức Hoàng',
+    moderator: 'Trương Quang Khang',
     total_members: 40,
     event: 40,
   },
@@ -68,95 +70,96 @@ const FakeData = [
     total_members: 40,
     event: 40,
   },
-  // {
-  //   id: 8,
-  //   forum: '20TCLC_DT3',
-  //   moderator: 'Võ Đức Hoàng',
-  //   total_members: 40,
-  //   event: 40,
-  // },
-  // {
-  //   id: 9,
-  //   forum: '20TCLC_DT3',
-  //   moderator: 'Võ Đức Hoàng',
-  //   total_members: 40,
-  //   event: 40,
-  // },
-  // {
-  //   id: 10,
-  //   forum: '20TCLC_DT3',
-  //   moderator: 'Võ Đức Hoàng',
-  //   total_members: 40,
-  //   event: 40,
-  // },
-  // {
-  //   id: 11,
-  //   forum: '20TCLC_DT3',
-  //   moderator: 'Võ Đức Hoàng',
-  //   total_members: 40,
-  //   event: 40,
-  // },
-  // {
-  //   id: 12,
-  //   forum: '20TCLC_DT3',
-  //   moderator: 'Võ Đức Hoàng',
-  //   total_members: 40,
-  //   event: 40,
-  // },
-  // {
-  //   id: 13,
-  //   forum: '20TCLC_DT3',
-  //   moderator: 'Võ Đức Hoàng',
-  //   total_members: 40,
-  //   event: 40,
-  // },
-  // {
-  //   id: 14,
-  //   forum: '20TCLC_DT3',
-  //   moderator: 'Võ Đức Hoàng',
-  //   total_members: 40,
-  //   event: 40,
-  // },
-  // {
-  //   id: 15,
-  //   forum: '20TCLC_DT3',
-  //   moderator: 'Võ Đức Hoàng',
-  //   total_members: 40,
-  //   event: 40,
-  // },
-  // {
-  //   id: 16,
-  //   forum: '20TCLC_DT3',
-  //   moderator: 'Võ Đức Hoàng',
-  //   total_members: 40,
-  //   event: 40,
-  // },
-  // {
-  //   id: 17,
-  //   forum: '20TCLC_DT3',
-  //   moderator: 'Võ Đức Hoàng',
-  //   total_members: 40,
-  //   event: 40,
-  // },
-  // {
-  //   id: 18,
-  //   forum: '20TCLC_DT3',
-  //   moderator: 'Võ Đức Hoàng',
-  //   total_members: 40,
-  //   event: 40,
-  // },
-  // {
-  //   id: 19,
-  //   forum: '20TCLC_DT3',
-  //   moderator: 'Võ Đức Hoàng',
-  //   total_members: 40,
-  //   event: 40,
-  // },
+  {
+    id: 8,
+    forum: '20TCLC_DT3',
+    moderator: 'Võ Đức Hoàng',
+    total_members: 40,
+    event: 40,
+  },
+  {
+    id: 9,
+    forum: '20TCLC_DT3',
+    moderator: 'Võ Đức Hoàng',
+    total_members: 40,
+    event: 40,
+  },
+  {
+    id: 10,
+    forum: '20TCLC_DT3',
+    moderator: 'Võ Đức Hoàng',
+    total_members: 40,
+    event: 40,
+  },
+  {
+    id: 11,
+    forum: '20TCLC_DT3',
+    moderator: 'Võ Đức Hoàng',
+    total_members: 40,
+    event: 40,
+  },
+  {
+    id: 12,
+    forum: '20TCLC_DT3',
+    moderator: 'Võ Đức Hoàng',
+    total_members: 40,
+    event: 40,
+  },
+  {
+    id: 13,
+    forum: '20TCLC_DT3',
+    moderator: 'Võ Đức Hoàng',
+    total_members: 40,
+    event: 40,
+  },
+  {
+    id: 14,
+    forum: '20TCLC_DT3',
+    moderator: 'Võ Đức Hoàng',
+    total_members: 40,
+    event: 40,
+  },
+  {
+    id: 15,
+    forum: '20TCLC_DT3',
+    moderator: 'Võ Đức Hoàng',
+    total_members: 40,
+    event: 40,
+  },
+  {
+    id: 16,
+    forum: '20TCLC_DT3',
+    moderator: 'Võ Đức Hoàng',
+    total_members: 40,
+    event: 40,
+  },
+  {
+    id: 17,
+    forum: '20TCLC_DT3',
+    moderator: 'Nguyễn Văn B',
+    total_members: 40,
+    event: 40,
+  },
+  {
+    id: 18,
+    forum: '20TCLC_DT3',
+    moderator: 'Nguyễn Văn A',
+    total_members: 40,
+    event: 40,
+  },
+  {
+    id: 19,
+    forum: '20TCLC_DT3',
+    moderator: 'Nguyễn Văn Thịnh',
+    total_members: 40,
+    event: 40,
+  },
 ]
 
 interface Props {}
 
 const ForumTab: FC<Props> = (): JSX.Element => {
+  const navigate = useNavigate()
   const [inputSearch, setInputSearch] = useState<string>('')
   const [rowsData, setRows] = useState<IForum[]>([])
   const [rowTotal, setRowTotal] = useState(0)
@@ -184,8 +187,12 @@ const ForumTab: FC<Props> = (): JSX.Element => {
   }, [])
 
   const handleSortModelChange = useCallback((newSortModel: GridSortModel) => {
-    console.log(newSortModel)
     setSortModel(newSortModel)
+    if (newSortModel[0].field === 'moderator') {
+      console.log('moderator.fullName:' + newSortModel[0].sort)
+    } else {
+      console.log(newSortModel[0].field + ':' + newSortModel[0].sort)
+    }
     // Here you save the data you need from the sort model
   }, [])
 
@@ -225,16 +232,26 @@ const ForumTab: FC<Props> = (): JSX.Element => {
       align: 'left',
       headerAlign: 'left',
       hideable: false,
+      renderCell: (params: GridRenderCellParams<any, string>) => (
+        <Tooltip title={params.row.forum}>
+          <p className={`text-black line-clamp-1`}>{params.row.forum}</p>
+        </Tooltip>
+      ),
     },
     {
       field: 'moderator',
       headerName: 'Moderator',
-      type: 'number',
+      type: 'string',
       flex: 2,
       minWidth: 150,
       align: 'left',
       headerAlign: 'left',
       hideable: false,
+      renderCell: (params: GridRenderCellParams<any, string>) => (
+        <Tooltip title={params.row.moderator}>
+          <p className={`text-black line-clamp-1`}>{params.row.moderator}</p>
+        </Tooltip>
+      ),
     },
     {
       field: 'total_members',
@@ -271,29 +288,33 @@ const ForumTab: FC<Props> = (): JSX.Element => {
       disableColumnMenu: true,
       sortable: false,
       disableSelectionOnClick: false,
-      renderCell: () => {
-        return <BtnAction />
+      renderCell: (params: GridRenderCellParams<any, any>) => {
+        return <BtnAction params={params} />
       },
     },
   ]
 
-  const BtnAction = ({}) => {
+  const BtnAction = (params: any) => {
     return (
       <>
         <div className={`flex gap-2`}>
           <VisibilityIcon
             sx={{ cursor: 'pointer', color: '#1278ccf0' }}
-            onClick={() => {}}
+            onClick={() => {
+              navigate('/forum-management/' + params.params.row.id)
+            }}
           />
           <EditIcon
             sx={{ cursor: 'pointer' }}
             onClick={() => {
+              setRowSelected(params.params.row.id)
               setOpenModalEdit(true)
             }}
           />
           <DeleteIcon
             sx={{ color: '#d32f2f', cursor: 'pointer' }}
             onClick={() => {
+              setRowSelected(params.params.row.id)
               setOpenModalDelete(true)
             }}
           />
@@ -338,7 +359,6 @@ const ForumTab: FC<Props> = (): JSX.Element => {
             onPaginationModelChange={setPaginationModel}
             loading={loading}
             totalRow={rowTotal}
-            setRowSelected={setRowSelected}
           />
         </div>
       </div>

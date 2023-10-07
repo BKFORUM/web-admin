@@ -41,10 +41,8 @@ const DefaultLayout: FC<Props> = (): JSX.Element => {
           open={open}
           setOpen={setOpen}
         />
-        <main className='mt-20 mb-4 flex-1 bg-white rounded-3xl p-4 overflow-y-hidden overflow-x-hidden'>
-          <div className='overflow-hidden'>
-            <Outlet />
-          </div>
+        <main className='mt-20 mb-4 flex flex-col flex-1 bg-white rounded-3xl p-4 overflow-y-hidden overflow-x-hidden'>
+          <Outlet />
         </main>
       </div>
       {/* <Notification

@@ -1,18 +1,19 @@
 import { GridRenderCellParams, GridSortModel } from '@mui/x-data-grid'
 import { FC, useCallback, useEffect, useState } from 'react'
-import EditIcon from '@mui/icons-material/Edit'
-import DeleteIcon from '@mui/icons-material/Delete'
-import VisibilityIcon from '@mui/icons-material/Visibility'
 import Table from '@components/Table'
 import SearchInput from '@components/SearchInput'
 import Button from '@components/Button/Button'
-interface Props {}
+import MoreVertOutlinedIcon from '@mui/icons-material/MoreVertOutlined'
+import DoneIcon from '@mui/icons-material/Done'
+import ClearIcon from '@mui/icons-material/Clear'
 
+import { IconButton, Menu, MenuItem, Tooltip } from '@mui/material'
+interface Props {}
 interface IRequestForum {
   id: number
   name: string
   creator: string
-  categories: string
+  categories: string[]
   create_at: string
 }
 
@@ -21,40 +22,97 @@ const FakeData = [
     id: 1,
     name: 'Diễn đàng sv khoa IT',
     creator: 'Truong Quang Khang',
-    categories: 'hoc tap',
-    create_at: '1-10-2023 14:02',
+    categories: ['hoc tap'],
+    create_at: '1-10-2023',
   },
   {
     id: 2,
     name: 'Diễn đàng sv khoa IT',
     creator: 'Truong Quang Khang',
-    categories: 'hoc tap',
-    create_at: '1-10-2023 14:02',
+    categories: ['hoc tap'],
+    create_at: '1-10-2023',
   },
   {
     id: 3,
     name: 'Diễn đàng sv khoa IT',
     creator: 'Truong Quang Khang',
-    categories: 'hoc tap',
-    create_at: '1-10-2023 14:02',
+    categories: ['hoc tap'],
+    create_at: '1-10-2023',
   },
   {
     id: 4,
     name: 'Diễn đàng sv khoa IT',
     creator: 'Truong Quang Khang',
-    categories: 'hoc tap',
-    create_at: '1-10-2023 14:02',
+    categories: ['hoc tap', 'the thao', 'am nhac', 'xa hoi'],
+    create_at: '1-10-2023',
   },
   {
     id: 5,
     name: 'Diễn đàng sv khoa IT',
     creator: 'Truong Quang Khang',
-    categories: 'hoc tap',
-    create_at: '1-10-2023 14:02',
+    categories: ['hoc tap', 'game'],
+    create_at: '1-10-2023',
   },
 ]
 
-const RequestForum: FC<Props> = (props): JSX.Element => {
+function ActionsMenu({ params }: any) {
+  const [anchorEl, setAnchorEl] = useState(null)
+
+  const handleClick = (event: any) => {
+    setAnchorEl(event.currentTarget)
+  }
+
+  const handleClose = () => {
+    setAnchorEl(null)
+  }
+
+  const handleAddClick = () => {
+    console.log(`Add clicked for item with ID ${params.row.id}`)
+    handleClose()
+  }
+
+  const handleEditClick = () => {
+    console.log(`Edit clicked for item with ID ${params.row.id}`)
+    handleClose()
+  }
+
+  return (
+    <>
+      <>
+        <div className={`lg:flex gap-2 xs:hidden`}>
+          <Button typeButton='approve'>Approve</Button>
+          <Button typeButton='reject'>Reject</Button>
+        </div>
+      </>
+      <div className='xs:block lg:hidden'>
+        <IconButton
+          aria-label='Actions'
+          aria-controls='actions-menu'
+          aria-haspopup='true'
+          onClick={handleClick}>
+          <MoreVertOutlinedIcon />
+        </IconButton>
+        <Menu
+          id='actions-menu'
+          anchorEl={anchorEl}
+          keepMounted
+          open={Boolean(anchorEl)}
+          onClose={handleClose}>
+          <MenuItem onClick={handleAddClick}>
+            <DoneIcon className='text-green-600' />
+            <span className='ml-2 text-green-600'> Approve</span>
+          </MenuItem>
+          <MenuItem onClick={handleEditClick}>
+            <ClearIcon className='text-red-600' />
+            <span className='ml-2 text-red-600'> Reject</span>
+          </MenuItem>
+        </Menu>
+      </div>
+    </>
+  )
+}
+
+const RequestForum: FC<Props> = (): JSX.Element => {
   const [inputSearch, setInputSearch] = useState<string>('')
   const [rowsData, setRows] = useState<IRequestForum[]>([])
   const [rowTotal, setRowTotal] = useState(0)
@@ -64,7 +122,6 @@ const RequestForum: FC<Props> = (props): JSX.Element => {
   })
   const [sortModel, setSortModel] = useState<GridSortModel>([])
   const [loading, setLoading] = useState<boolean>(false)
-  const [rowSelected, setRowSelected] = useState<number | null>(null)
 
   useEffect(() => {
     setLoading(true)
@@ -113,6 +170,11 @@ const RequestForum: FC<Props> = (props): JSX.Element => {
       align: 'left',
       headerAlign: 'left',
       hideable: false,
+      renderCell: (params: GridRenderCellParams<any, string>) => (
+        <Tooltip title={params.row.name}>
+          <p className={`text-black line-clamp-1`}>{params.row.name}</p>
+        </Tooltip>
+      ),
     },
     {
       field: 'creator',
@@ -123,21 +185,45 @@ const RequestForum: FC<Props> = (props): JSX.Element => {
       align: 'left',
       headerAlign: 'left',
       hideable: false,
+      renderCell: (params: GridRenderCellParams<any, string>) => (
+        <Tooltip title={params.row.creator}>
+          <p className={`text-black line-clamp-1`}>{params.row.creator}</p>
+        </Tooltip>
+      ),
     },
     {
       field: 'categories',
       headerName: 'Categories',
-      type: 'string',
       minWidth: 100,
-      flex: 1,
+      flex: 2,
       align: 'left',
       headerAlign: 'left',
       hideable: false,
-      renderCell: (params: GridRenderCellParams<any, string>) => (
-        <p className='text-black bg-slate-200 px-3 py-1 rounded-2xl'>
-          {params.row.categories}
-        </p>
-      ),
+      renderCell: (params: GridRenderCellParams<any, string>) =>
+        params.row.categories.length > 2 ? (
+          <div className='flex'>
+            {params.row.categories.slice(0, 2).map((item: string, index: number) => (
+              <p
+                key={index}
+                className='text-black bg-slate-200 px-3 py-1 rounded-2xl mr-2 line-clamp-1'>
+                {item}
+              </p>
+            ))}
+            <Tooltip title={params.row.categories.slice(2).join(', ')}>
+              <p className='text-black bg-slate-200 px-3 py-1 rounded-2xl mr-2 line-clamp-1'>
+                + {params.row.categories.length - 2}
+              </p>
+            </Tooltip>
+          </div>
+        ) : (
+          params.row.categories.map((item: string, index: number) => (
+            <p
+              key={index}
+              className='text-black bg-slate-200 px-3 py-1 rounded-2xl mr-2 line-clamp-1'>
+              {item}
+            </p>
+          ))
+        ),
     },
     {
       field: 'create_at',
@@ -153,30 +239,18 @@ const RequestForum: FC<Props> = (props): JSX.Element => {
     {
       field: 'status',
       headerName: 'Status',
-      minWidth: 80,
       flex: 1,
-      align: 'left',
-      headerAlign: 'left',
+      minWidth: 80,
+      align: 'center',
+      headerAlign: 'center',
       disableColumnMenu: true,
       sortable: false,
       disableSelectionOnClick: false,
-      renderCell: () => {
-        return <BtnAction />
-      },
+      renderCell: (params: GridRenderCellParams<any, any>) => (
+        <ActionsMenu params={params} />
+      ),
     },
   ]
-
-  const BtnAction = ({}) => {
-    return (
-      <>
-        <div className={`flex gap-2`}>
-          <Button typeButton='approve'>Approve</Button>
-          <Button typeButton='reject'>Reject</Button>
-        </div>
-      </>
-    )
-  }
-
   return (
     <div>
       <div className='flex justify-between items-center '>
@@ -196,7 +270,6 @@ const RequestForum: FC<Props> = (props): JSX.Element => {
           onPaginationModelChange={setPaginationModel}
           loading={loading}
           totalRow={rowTotal}
-          setRowSelected={setRowSelected}
         />
       </div>
     </div>

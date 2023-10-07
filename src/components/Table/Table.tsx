@@ -11,7 +11,7 @@ interface IProps {
   paginationModel?: any
   onSortModelChange?: (sortModel: GridSortModel) => void
   onPaginationModelChange?: any
-  setRowSelected?: any
+  hiddenFooter?: any
 }
 
 const Table = ({
@@ -23,7 +23,7 @@ const Table = ({
   onSortModelChange,
   paginationModel,
   onPaginationModelChange,
-  setRowSelected,
+  hiddenFooter,
 }: IProps) => {
   return (
     <Box sx={{ mt: '8px', width: '100%', backgroundColor: '#fff' }}>
@@ -44,6 +44,16 @@ const Table = ({
             fontWeight: 'bold',
           },
           height: '100%',
+          '& .MuiDataGrid-footerContainer': {
+            display: `${hiddenFooter ? 'none' : 'block'}`,
+          },
+          '& .MuiDataGrid-virtualScroller': {
+            height: `${hiddenFooter && rows.length > 8 ? '400px' : 'auto'}`,
+            overflowY: `${
+              hiddenFooter && rows.length > 8 ? 'scroll !important' : 'auto'
+            }`,
+            overflowX: 'hidden',
+          },
         }}
         rows={rows}
         columns={columns}
@@ -53,19 +63,14 @@ const Table = ({
         sortModel={sortModel}
         sortingOrder={['asc', 'desc']}
         onSortModelChange={onSortModelChange}
-        getRowHeight={() => 'auto'}
         hideFooterSelectedRowCount={true}
+        hideFooterPagination={hiddenFooter}
+        getRowHeight={() => 'auto'}
         autoHeight
-        hideFooterPagination={false}
         pageSizeOptions={[10]}
-        paginationModel={paginationModel}
         // paginationMode='server'
+        paginationModel={paginationModel}
         onPaginationModelChange={onPaginationModelChange}
-        onRowSelectionModelChange={(ids) => {
-          const selectedIDs = new Set(ids)
-          const selectedRows = rows.filter((row: any) => selectedIDs.has(row.id))
-          setRowSelected(selectedRows)
-        }}
       />
     </Box>
   )

@@ -3,18 +3,25 @@ import SearchIcon from '@mui/icons-material/Search'
 import { FC } from 'react'
 
 interface IProps {
+  size?: string
   value: string
+  width?: string
   setValue: (value: string) => void
 }
 
-const SearchInput: FC<IProps> = ({ value, setValue }: IProps): JSX.Element => {
+const SearchInput: FC<IProps> = ({
+  value,
+  setValue,
+  size,
+  width,
+}: IProps): JSX.Element => {
   return (
     <Paper
       sx={{
-        p: '2px 4px',
+        p: size === 'small' ? '1px 4px' : '2px 4px',
         display: 'flex',
         alignItems: 'center',
-        width: 400,
+        width: width ? width : 400,
         borderRadius: 12,
         bgcolor: '#E6F0F6',
       }}>

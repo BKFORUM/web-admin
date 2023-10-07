@@ -48,7 +48,7 @@ const ModalAddEditForum: FC<Props> = ({
         action=''
         className='flex flex-col gap-2'
         onSubmit={handleSubmit(onSubmit)}>
-        <div className='flex justify-between items-center gap-1'>
+        <div className='flex flex-col gap-1'>
           <label
             htmlFor=''
             className='font-semibold text-gray-700'>
@@ -61,7 +61,7 @@ const ModalAddEditForum: FC<Props> = ({
           />
         </div>
 
-        <div className='flex justify-between items-center gap-1'>
+        <div className='flex flex-col gap-1'>
           <label
             htmlFor=''
             className='font-semibold text-gray-700'>

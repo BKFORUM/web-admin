@@ -19,6 +19,7 @@ import Button from '@components/Button/Button'
 import { useStoreActions } from 'easy-peasy'
 import { authActionSelector } from '@store/index'
 import { useNavigate } from 'react-router-dom'
+import axios from 'axios'
 
 interface Props {}
 interface IFormInput {
@@ -62,6 +63,12 @@ const Login: FC<Props> = (): JSX.Element => {
       navigate('/')
       console.log(res)
     }
+    // try {
+    //   const res = await axios.post('http://4.193.139.208/auth/signUp', data)
+    //   console.log(res)
+    // } catch (error) {
+    //   console.log(error)
+    // }
   }
   return (
     <div className='min-h-screen relative'>

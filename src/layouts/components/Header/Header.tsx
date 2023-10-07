@@ -9,7 +9,7 @@ interface Props {
 const Header: FC<Props> = ({ open, setOpen }: Props): JSX.Element => {
   return (
     <nav
-      className={`z-30 fixed flex flex-row flex-nowrap items-center justify-between rounded-3xl mt-0 py-2 left-4 right-4 px-4 bg-white dark:bg-gray-800 shadow-sm transition-all duration-500 ease-in-out 
+      className={`z-30 fixed flex flex-row flex-nowrap items-center justify-between rounded-3xl mt-0 py-2 left-4 right-4 px-4 bg-white shadow-sm transition-all duration-500 ease-in-out 
           ${open ? 'xl:left-24 sx:left-4' : 'xl:left-[304px] sx:left-4'}`}
       id='desktop-menu'>
       <button

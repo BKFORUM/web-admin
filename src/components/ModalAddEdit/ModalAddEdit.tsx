@@ -1,6 +1,7 @@
 import { Box, Modal } from '@mui/material'
 import { FC } from 'react'
 import ModalAddEditForum from './ModalAddEditForum'
+import ModalAddUserForum from './ModalAddUserForum'
 interface Props {
   open: boolean
   handleClose?: any
@@ -46,6 +47,12 @@ const ModalAddEdit: FC<Props> = ({
             {page === 'FORUM' && (
               <ModalAddEditForum
                 rowSelected={rowSelected}
+                handleClose={handleClose}
+                handleAction={handleAction}
+              />
+            )}
+            {page === 'VIEW_FORUM' && (
+              <ModalAddUserForum
                 handleClose={handleClose}
                 handleAction={handleAction}
               />
