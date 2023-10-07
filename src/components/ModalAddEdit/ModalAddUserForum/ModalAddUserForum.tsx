@@ -198,7 +198,9 @@ const ModalAddUserForum: FC<Props> = ({ handleClose }: Props): JSX.Element => {
           return (
             <div
               key={index}
-              className='flex justify-between items-center hover:bg-slate-100 cursor-pointer rounded-xl py-1.5 '
+              className={`flex justify-between items-center cursor-pointer rounded-xl py-1.5 ${
+                item.checked ? 'bg-slate-100' : 'hover:bg-slate-100'
+              } `}
               onClick={() => handleCheckboxChange(item.id)}>
               <div className='flex gap-2 items-center'>
                 <div className='h-12 w-12  rounded-[50%] overflow-hidden ml-3'>
