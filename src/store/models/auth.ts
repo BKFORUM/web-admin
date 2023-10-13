@@ -1,5 +1,5 @@
 import { persist, action, Action, Thunk, thunk } from "easy-peasy";
-import { login, refreshToken } from "../../services/auth.service";
+import { login } from "../../services/auth.service";
 import { IUserLogin } from "@interfaces/IUser";
 
 export interface IAuthModel {
@@ -8,9 +8,6 @@ export interface IAuthModel {
   setMessageError: Action<IAuthModel, string>;
   //Login
   login: Thunk<IAuthModel, IUserLogin>;
-
-  //RefreshToken
-  refreshToken: Thunk<IAuthModel, undefined>
 }
 
 export const authModel: IAuthModel = persist({
@@ -30,13 +27,4 @@ export const authModel: IAuthModel = persist({
         actions.setMessageError(error?.response?.data?.message)
       });
   }),
-
-  //RefreshToken
-  refreshToken: thunk(async (actions) => {
-    return refreshToken().then(async (res) => {
-      return res.data
-    }).catch((error) => {
-      actions.setMessageError(error?.response?.data?.message)
-    });
-  })
 })

@@ -9,11 +9,4 @@ const login = (data: IUserLogin) => {
     });
 };
 
-const refreshToken = () => {
-    return BaseURL({
-        url: `/auth/refresh`,
-    });
-}
-
-
-export { login, refreshToken }
+export { login }

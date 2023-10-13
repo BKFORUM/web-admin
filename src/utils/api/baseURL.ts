@@ -1,12 +1,5 @@
-// import IsTokenValid from "@utils/functions/isValidToken";
-import { authActionSelector, authStateSelector, notifyActionSelector } from "@store/index";
 import axios from "axios";
-import { useStoreActions, useStoreState } from "easy-peasy";
 import jwt_decode from 'jwt-decode'
-
-const { refreshToken } = useStoreActions(authActionSelector)
-const { messageError } = useStoreState(authStateSelector)
-const { setNotifySetting } = useStoreActions(notifyActionSelector)
 
 const BaseURL = axios.create({
   baseURL: `${import.meta.env.VITE_REACT_APP_API_URL}`,
@@ -36,31 +29,28 @@ BaseURL.interceptors.response.use(
   },
   async (err) => {
     const originalConfig = err.config;
-
     if (originalConfig.url !== "/auth/login" && err.response) {
       // Access Token was expired
       if (err.response.status === 401 && !originalConfig._retry) {
         originalConfig._retry = true;
-        const res = await refreshToken()
-        if (res) {
-          var decoded: any = jwt_decode(res?.accessToken)
-          const user = {
-            name: decoded?.name,
-            // email: decoded?.email,
-            exp: decoded?.exp,
-            role: decoded?.roles[0],
-            access_token: res?.accessToken,
-            refresh_token: res?.refreshToken,
+        try {
+          const res = await axios.get('http://52.139.152.154/auth/refresh')
+          if (res) {
+            var decoded: any = jwt_decode(res?.data?.accessToken)
+            const user = {
+              name: decoded?.name,
+              exp: decoded?.exp,
+              role: decoded?.roles[0],
+              access_token: res?.data?.accessToken,
+              refresh_token: res?.data?.refreshToken,
+            }
+            localStorage.setItem('user', JSON.stringify(user))
           }
-          localStorage.setItem('user', JSON.stringify(user))
-          setNotifySetting({ show: true, status: 'success', message: 'Login successful' })
-        } else {
-          console.log('error', messageError)
-          setNotifySetting({ show: true, status: 'error', message: messageError })
+        } catch (error: any) {
+          console.log('error', error?.response?.data?.message)
         }
       }
     }
-
     return Promise.reject(err);
   }
 );

@@ -8,7 +8,8 @@ import ViewUser from "@pages/UserManagement/components/ViewUser";
 
 
 export const routerAdmin = [
-    { path: ROUTER.FORUM, element: Forum, index: true },
+    { path: ROUTER.HOME, element: Forum, },
+    { path: ROUTER.FORUM, element: Forum, },
     { path: ROUTER.VIEW_FORUM, element: ViewForum },
     { path: ROUTER.USER_MANAGEMENT, element: UserManagement },
     { path: ROUTER.VIEW_USER, element: ViewUser },

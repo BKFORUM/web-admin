@@ -24,6 +24,7 @@ const Sidebar: FC<IProps> = ({ open }: IProps): JSX.Element => {
   const [selected, setSelected] = useState<number | null>(null)
   useEffect(() => {
     const routePath = `/${pathname.split('/')[1]}`
+    if (routePath === '/') setSelected(0)
     DATA_SIDEBAR.map((item) => {
       if (routePath === item.pathName) {
         setSelected(item.id)

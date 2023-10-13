@@ -1,5 +1,6 @@
 export const ROUTER = Object.freeze({
   LOGIN: '/login',
+  HOME: '/',
   FORUM: '/forum-management',
   VIEW_FORUM: '/forum-management/:id',
   USER_MANAGEMENT: '/user-management',

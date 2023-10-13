@@ -1,6 +1,5 @@
-interface IUserLogin {
+export interface IUserLogin {
     email: string;
     password: string;
 }
 
-export { IUserLogin }
