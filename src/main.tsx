@@ -4,12 +4,15 @@ import './index.css'
 import { BrowserRouter } from 'react-router-dom'
 import { StoreProvider } from 'easy-peasy'
 import store from '@store/index.ts'
-import React from 'react'
+import { LocalizationProvider } from '@mui/x-date-pickers'
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <BrowserRouter>
-    <StoreProvider store={store}>
-      <App />
-    </StoreProvider>
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <StoreProvider store={store}>
+        <App />
+      </StoreProvider>
+    </LocalizationProvider>
   </BrowserRouter>,
 )

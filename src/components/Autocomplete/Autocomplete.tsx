@@ -1,11 +1,10 @@
 import { Autocomplete, TextField } from '@mui/material'
 import { FC } from 'react'
-import { Controller } from 'react-hook-form'
-
 interface IProps {
-  name: string
-  control: any
+  value: any
+  onChange: any
   placeholder: string
+  error: any
 }
 
 const top100Films = [
@@ -136,108 +135,56 @@ const top100Films = [
 ]
 
 const AutocompleteCustom: FC<IProps> = ({
-  name,
-  control,
+  value,
+  error,
   placeholder,
+  onChange,
 }: IProps): JSX.Element => {
   return (
-    <div>
-      <Controller
-        name={name}
-        control={control}
-        defaultValue={null}
-        render={({ field: { onChange, value }, fieldState: { error } }) => (
-          <>
-            <Autocomplete
-              id='combo-box-demo'
-              size='small'
-              options={top100Films}
-              onChange={(event, option) => {
-                if (option === null) onChange('')
-                else onChange(option?.label)
-              }}
-              value={value}
-              renderOption={(props, option) => {
-                return (
-                  <li
-                    {...props}
-                    key={option?.label}>
-                    {option?.label}
-                  </li>
-                )
-              }}
-              sx={{
-                width: '100%',
-                '& .MuiOutlinedInput-root.MuiInputBase-sizeSmall ': {
-                  paddingTop: '8px',
-                  paddingBottom: '8px',
-                  borderRadius: '6px',
-                },
-                '& .MuiOutlinedInput-notchedOutline': {
-                  borderColor: 'rgb(203 213 225)',
-                },
-                '& .MuiAutocomplete-root fieldset:hover': {
-                  borderColor: 'rgb(203 213 225)',
-                },
-              }}
-              isOptionEqualToValue={(option, value) => {
-                return option?.label === value
-              }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  placeholder={placeholder}
-                  variant='outlined'
-                />
-              )}
-            />
-            {!!error && <span className='text-red-600 text-sm'>{error?.message}</span>}
-          </>
-        )}
-      />
-      {/* <Autocomplete
+    <>
+      <Autocomplete
         id='combo-box-demo'
         size='small'
         options={top100Films}
-        getOptionLabel={(option) => option.label}
-        //   defaultValue={() => defaultValue(order)}
+        onChange={(event, option) => {
+          if (option === null) onChange('')
+          else onChange(option?.label)
+        }}
+        value={value}
         renderOption={(props, option) => {
           return (
             <li
               {...props}
-              key={option.label}>
-              {option.label}
+              key={option?.label}>
+              {option?.label}
             </li>
           )
         }}
-        //   isOptionEqualToValue={(option, value) => option.value === value.value}
         sx={{
           width: '100%',
           '& .MuiOutlinedInput-root.MuiInputBase-sizeSmall ': {
             paddingTop: '8px',
             paddingBottom: '8px',
             borderRadius: '6px',
+            backgroundColor: '#E6F0F6',
           },
           '& .MuiOutlinedInput-notchedOutline': {
-            borderColor: 'rgb(203 213 225)',
+            border: !!error ? '1px solid red' : 'none',
           },
-          '& .MuiAutocomplete-root fieldset:hover': {
-            borderColor: 'rgb(203 213 225)',
-            outline: 'none',
-          },
+        }}
+        isOptionEqualToValue={(option, value) => {
+          return option?.label === value
         }}
         renderInput={(params) => (
           <TextField
             {...params}
-            placeholder='Description'
+            placeholder={placeholder}
             variant='outlined'
           />
         )}
-      /> */}
-      {/* {validate && !order.fishId && !order?.Fish?.id && (
-          <span className='mess-error'>Please enter Description</span>
-        )} */}
-    </div>
+      />
+      {!!error && <span className='text-red-600 text-sm'>{error?.message}</span>}
+    </>
   )
 }
 

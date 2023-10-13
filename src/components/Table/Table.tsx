@@ -30,7 +30,7 @@ const Table = ({
       <DataGrid
         sx={{
           '&.MuiDataGrid-root--densityStandard .MuiDataGrid-cell': {
-            py: '10px',
+            py: '8px',
             display: 'flex',
             alignItems: 'center',
           },
@@ -43,16 +43,14 @@ const Table = ({
           '& .MuiDataGrid-columnHeaderTitle': {
             fontWeight: 'bold',
           },
-          height: '100%',
+          // height: '100%',
           '& .MuiDataGrid-footerContainer': {
-            display: `${hiddenFooter ? 'none' : 'block'}`,
+            display: `${hiddenFooter ? 'none' : ''}`,
           },
           '& .MuiDataGrid-virtualScroller': {
-            height: `${hiddenFooter && rows.length > 8 ? '400px' : 'auto'}`,
-            overflowY: `${
-              hiddenFooter && rows.length > 8 ? 'scroll !important' : 'auto'
-            }`,
-            overflowX: 'hidden',
+            height: `${hiddenFooter && rows.length > 4 ? '280px' : ''}`,
+            overflow: `${hiddenFooter && rows.length > 4 ? 'overlay !important' : ''}`,
+            scrollbarGutter: 'stable',
           },
         }}
         rows={rows}

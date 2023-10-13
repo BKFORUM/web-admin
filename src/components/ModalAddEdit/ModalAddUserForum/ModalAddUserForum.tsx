@@ -226,7 +226,6 @@ const ModalAddUserForum: FC<Props> = ({ handleClose }: Props): JSX.Element => {
       <Button
         typeButton='primary'
         disabled={userSelected.length === 0 ? true : false}
-        onClick={() => scrollToLast()}
         className={`mt-4`}>
         Add
       </Button>

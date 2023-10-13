@@ -4,7 +4,7 @@ import { Controller } from 'react-hook-form'
 interface IProps {
   name: string
   control: any
-  placeholder: string
+  placeholder?: string
 }
 
 const CustomTextInput = ({ error, onChange, value, placeholder }: any): JSX.Element => {
@@ -15,7 +15,9 @@ const CustomTextInput = ({ error, onChange, value, placeholder }: any): JSX.Elem
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        className='px-3 py-2 border border-slate-300 rounded-md outline-none focus:ring-1 focus:ring-blue-500 w-full'
+        className={`px-3 py-2.5 bg-[#E6F0F6] rounded-md outline-none ${
+          !!error && 'border border-red-600'
+        }`}
       />
       {!!error && <span className='text-red-600 text-sm'>{error?.message}</span>}
     </div>

@@ -1,14 +1,11 @@
-// import Header from '@layouts/components/Header/Header'
 import Header from '@layouts/components/Header/Header'
 import Sidebar from '@layouts/components/Sidebar/Sidebar'
 import { FC, useState } from 'react'
-import { Outlet } from 'react-router-dom'
-// import { Outlet } from 'react-router-dom'
 interface Props {
   children?: React.ReactNode
 }
 
-const DefaultLayout: FC<Props> = (): JSX.Element => {
+const DefaultLayout: FC<Props> = ({ children }: Props): JSX.Element => {
   const [open, setOpen] = useState<boolean>(false)
   return (
     <div
@@ -42,16 +39,11 @@ const DefaultLayout: FC<Props> = (): JSX.Element => {
           setOpen={setOpen}
         />
         <main className='mt-20 mb-4 flex flex-col flex-1 bg-white rounded-3xl p-4 overflow-y-hidden overflow-x-hidden'>
-          <Outlet />
+          {/* <Outlet />
+           */}
+          {children}
         </main>
       </div>
-      {/* <Notification
-      status={statusNotification}
-        title={messageNotification}
-        show={showNotification}
-        setShow={setShowNotification}
-
-      /> */}
     </div>
   )
 }

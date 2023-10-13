@@ -34,7 +34,7 @@ const SearchInput: FC<IProps> = ({
       <InputBase
         sx={{ ml: 1, flex: 1, pr: '10px' }}
         name='searchInput'
-        placeholder='Search'
+        placeholder='Search '
         value={value}
         onChange={(e) => setValue(e.target.value)}
       />

@@ -239,7 +239,7 @@ const RequestForum: FC<Props> = (): JSX.Element => {
     {
       field: 'status',
       headerName: 'Status',
-      flex: 1,
+      flex: 1.5,
       minWidth: 80,
       align: 'center',
       headerAlign: 'center',

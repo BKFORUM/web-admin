@@ -9,7 +9,7 @@ function RedirectForum(props: IProps): JSX.Element {
   const { pathname } = useLocation()
 
   if (user && pathname.split('/')[1] === 'login') {
-    return <Navigate to='/' />
+    return <Navigate to='/forum-management' />
   }
   return props.children
 }

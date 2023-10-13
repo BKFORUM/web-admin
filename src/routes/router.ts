@@ -3,14 +3,16 @@ import Forum from "@pages/Forum";
 import EventManagement from "@pages/EventManagement";
 import PostManagement from "@pages/PostManagement";
 import UserManagement from "@pages/UserManagement";
-import ViewForum from "@pages/Forum/component/ViewForum";
+import ViewForum from "@pages/Forum/components/ViewForum";
+import ViewUser from "@pages/UserManagement/components/ViewUser";
 
 
 export const routerAdmin = [
-    { path: ROUTER.FORUM, element: Forum },
+    { path: ROUTER.FORUM, element: Forum, index: true },
     { path: ROUTER.VIEW_FORUM, element: ViewForum },
-    { path: ROUTER.USERMANAGEMENT, element: UserManagement },
-    { path: ROUTER.POSTMANAGEMENT, element: PostManagement },
-    { path: ROUTER.EVENTMANAGEMENT, element: EventManagement },
+    { path: ROUTER.USER_MANAGEMENT, element: UserManagement },
+    { path: ROUTER.VIEW_USER, element: ViewUser },
+    { path: ROUTER.POST_MANAGEMENT, element: PostManagement },
+    { path: ROUTER.EVENT_MANAGEMENT, element: EventManagement },
 ];
 

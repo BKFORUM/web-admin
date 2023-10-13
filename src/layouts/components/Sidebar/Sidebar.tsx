@@ -1,10 +1,10 @@
-import { FC, useCallback, useState } from 'react'
+import { FC, useCallback, useEffect, useState } from 'react'
 import logo from '../../../assets/images/logobkforum.png'
 import logo1 from '../../../assets/images/logo-1.jpg'
 import { DATA_SIDEBAR } from '@commom/constants'
 import { MdOutlineCalendarMonth } from 'react-icons/md'
 import { HiOutlineUserGroup, HiOutlineStar, HiOutlinePencilSquare } from 'react-icons/hi2'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 interface IProps {
   open: boolean
@@ -20,7 +20,16 @@ interface IDataSidebar {
 
 const Sidebar: FC<IProps> = ({ open }: IProps): JSX.Element => {
   const navigate = useNavigate()
-  const [selected, setSelected] = useState<number>(0)
+  const { pathname } = useLocation()
+  const [selected, setSelected] = useState<number | null>(null)
+  useEffect(() => {
+    const routePath = `/${pathname.split('/')[1]}`
+    DATA_SIDEBAR.map((item) => {
+      if (routePath === item.pathName) {
+        setSelected(item.id)
+      }
+    })
+  }, [])
   const _renderIcon = useCallback((dataSidebar: IDataSidebar) => {
     let result = null
     switch (dataSidebar?.icon) {

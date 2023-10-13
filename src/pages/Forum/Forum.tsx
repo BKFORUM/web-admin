@@ -1,8 +1,8 @@
 import { FC, useState } from 'react'
 import { Box, Tab, Tabs } from '@mui/material'
 import TabPanel from '@components/TabPanel'
-import ForumTab from './component/ForumTab'
-import RequestForum from './component/RequestForum'
+import ForumTab from './components/ForumTab'
+import RequestForum from './components/RequestForum'
 
 interface Props {}
 

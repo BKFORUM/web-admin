@@ -1,5 +1,6 @@
 import React, { FC } from 'react'
 import logo from '../../assets/images/logobkforum.png'
+import bgImage from '../../assets/images/bg-login-default.jpg'
 import {
   FormControl,
   IconButton,
@@ -16,33 +17,31 @@ import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import Button from '@components/Button/Button'
-import { useStoreActions } from 'easy-peasy'
-import { authActionSelector } from '@store/index'
+import { useStoreActions, useStoreState } from 'easy-peasy'
+import { authActionSelector, authStateSelector, notifyActionSelector } from '@store/index'
 import { useNavigate } from 'react-router-dom'
-import axios from 'axios'
+import { IUserLogin } from '@interfaces/IUser'
+import jwt_decode from 'jwt-decode'
 
 interface Props {}
-interface IFormInput {
-  maSinhVien: string
-  passWord: string
-}
 
-const defaultValues: IFormInput = {
-  maSinhVien: '',
-  passWord: '',
+const defaultValues: IUserLogin = {
+  email: '',
+  password: '',
 }
 
 const schema = yup.object().shape({
-  maSinhVien: yup.string().required('Mã sinh viên không được để trống !!!'),
-  passWord: yup.string().required('Mật khẩu không được để trống !!!'),
+  email: yup.string().required('Mã sinh viên không được để trống !!!'),
+  password: yup.string().required('Mật khẩu không được để trống !!!'),
 })
 
 const Login: FC<Props> = (): JSX.Element => {
   const navigate = useNavigate()
+  const { messageError } = useStoreState(authStateSelector)
   const { login } = useStoreActions(authActionSelector)
-  // const { isLoginSuccess } = useStoreState(authStateSelector)
+  const { setNotifySetting } = useStoreActions(notifyActionSelector)
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
-  const { handleSubmit, control } = useForm<IFormInput>({
+  const { handleSubmit, control } = useForm<IUserLogin>({
     defaultValues: defaultValues,
     resolver: yupResolver(schema),
   })
@@ -54,33 +53,48 @@ const Login: FC<Props> = (): JSX.Element => {
     event.preventDefault()
   }
 
-  const onSubmit = async (data: IFormInput) => {
-    console.log(data)
+  const onSubmit = async (data: IUserLogin) => {
     setIsLoading(true)
-    const res = await login()
+    const res = await login(data)
+    console.log(res)
     if (res) {
       setIsLoading(false)
-      navigate('/')
-      console.log(res)
+      var decoded: any = jwt_decode(res?.accessToken)
+      console.log(decoded)
+      const user = {
+        name: decoded?.name,
+        // email: decoded?.email,
+        exp: decoded?.exp,
+        role: decoded?.roles[0],
+        access_token: res?.accessToken,
+        refresh_token: res?.refreshToken,
+      }
+      localStorage.setItem('user', JSON.stringify(user))
+      setNotifySetting({ show: true, status: 'success', message: 'Login successful' })
+      navigate('/forum-management')
+    } else {
+      console.log('error', messageError)
+      setNotifySetting({ show: true, status: 'error', message: messageError })
+      setIsLoading(false)
     }
     // try {
-    //   const res = await axios.post('http://4.193.139.208/auth/signUp', data)
+    //   const res = await axios.post('http://52.139.152.154/auth/login', data)
     //   console.log(res)
     // } catch (error) {
     //   console.log(error)
     // }
   }
   return (
-    <div className='min-h-screen relative'>
-      <div className='min-h-screen'>
-        {/* <img
-          className='w-full h-full'
+    <div className='h-screen relative'>
+      <div className='h-screen'>
+        <img
+          className='xs:hidden lg:block w-full h-full object-conver'
           src={bgImage}
           alt='bgImage'
-        /> */}
-        <div className='bg-gradient-to-b from-[#B1C7FF] via-[#606CE7] to-[#0001CB] w-full min-h-screen z-0'></div>
+        />
+        <div className='lg:hidden xs:block bg-gradient-to-b from-[#B1C7FF] via-[#606CE7] to-[#0001CB] w-full min-h-screen z-0'></div>
       </div>
-      <div className='absolute top-[40%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-center items-center '>
+      <div className='absolute top-[50%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-center items-center '>
         <div>
           <img
             src={logo}
@@ -88,36 +102,42 @@ const Login: FC<Props> = (): JSX.Element => {
           />
         </div>
         <div
-          className='bg-white z-50 mt-10 rounded-[25px] opacity-100 px-8 pb-14 
+          className='bg-white   z-50 mt-5 rounded-[25px]  px-8 pb-14 
         shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,_rgba(0,0,0,0.3)_0px_3px_7px_-3px]'>
           <h1 className='m-auto font-semibold text-center text-[28px] py-10'>Welcome</h1>
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className='flex flex-col min-w-[320px] gap-4 sm:container'>
+            className='flex flex-col min-w-[280px] gap-4 sm:container bg-opacity-50'>
             <Controller
-              name='maSinhVien'
+              name='email'
               control={control}
               render={({ field: { onChange, value }, fieldState: { error } }) => (
                 <TextFieldCustom
                   error={error}
                   onChange={onChange}
                   value={value}
-                  label='Mã sinh viên *'
+                  label='Email *'
                 />
               )}
             />
             <Controller
-              name='passWord'
+              name='password'
               control={control}
               render={({ field: { onChange, value }, fieldState: { error } }) => (
                 <FormControl
-                  sx={{ width: '100%' }}
+                  sx={{
+                    width: '100%',
+                    '& .MuiFormControl-root': {
+                      backgroundColor: '#000',
+                    },
+                  }}
                   error={!!error}
                   variant='standard'>
                   <InputLabel htmlFor='standard-adornment-password'>
                     Mật khẩu *
                   </InputLabel>
                   <Input
+                    sx={{ backgroundColor: 'rgba(255, 255, 255, 0.01)' }}
                     id='standard-adornment-password'
                     name='passWord'
                     type={showPassword ? 'text' : 'password'}

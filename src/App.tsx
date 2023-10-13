@@ -6,28 +6,39 @@ import Login from '@pages/Login'
 import NotFound from '@pages/NotFound'
 import ProtectedRoute from '@routes/ProtectedRoute'
 import RedirectForum from '@routes/RedirectForum'
+import Notify from '@components/Notify'
+import { useStoreActions, useStoreState } from 'easy-peasy'
+import { notifyActionSelector, notifyStateSelector } from './store'
 
 function App() {
+  const { notifySetting } = useStoreState(notifyStateSelector)
+  const { setNotifySetting } = useStoreActions(notifyActionSelector)
   return (
     <>
       <Routes>
-        <Route
-          path='/'
-          element={
-            <ProtectedRoute>
-              <DefaultLayout />
-            </ProtectedRoute>
-          }>
-          {routerAdmin.map((route, index) => {
-            return (
-              <Route
-                key={index}
-                path={route.path}
-                element={<route.element />}
-              />
-            )
-          })}
-        </Route>
+        {/* <Route
+            path='/'
+            element={
+              <ProtectedRoute>
+                <DefaultLayout />
+              </ProtectedRoute>
+            }> */}
+        {routerAdmin.map((route, index) => {
+          return (
+            <Route
+              key={index}
+              path={route.path}
+              element={
+                <ProtectedRoute>
+                  <DefaultLayout>
+                    <route.element />
+                  </DefaultLayout>
+                </ProtectedRoute>
+              }
+            />
+          )
+        })}
+        {/* </Route> */}
         <Route
           path='/login'
           element={
@@ -41,6 +52,11 @@ function App() {
           element={<NotFound />}
         />
       </Routes>
+
+      <Notify
+        notifySetting={notifySetting}
+        setNotifySetting={setNotifySetting}
+      />
     </>
   )
 }

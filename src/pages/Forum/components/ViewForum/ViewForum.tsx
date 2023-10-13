@@ -2,6 +2,7 @@ import { Tooltip } from '@material-ui/core'
 import { GridRenderCellParams, GridSortModel } from '@mui/x-data-grid'
 import { FC, useCallback, useEffect, useState } from 'react'
 import DeleteIcon from '@mui/icons-material/Delete'
+import ArrowBackIosOutlinedIcon from '@mui/icons-material/ArrowBackIosOutlined'
 import Table from '@components/Table'
 import Button from '@components/Button/Button'
 import { useNavigate } from 'react-router-dom'
@@ -68,13 +69,13 @@ const FakeData = [
     phone_number: '03262541254',
     date_of_birth: '1-10-2023',
   },
-  // {
-  //   id: 8,
-  //   name: 'Diễn đàng sv khoa IT',
-  //   email: '102200175@sv1.dut.dn.vn',
-  //   phone_number: '03262541254',
-  //   date_of_birth: '1-10-2023',
-  // },
+  {
+    id: 8,
+    name: 'Diễn đàng sv khoa IT',
+    email: '102200175@sv1.dut.dn.vn',
+    phone_number: '03262541254',
+    date_of_birth: '1-10-2023',
+  },
 
   // {
   //   id: 9,
@@ -185,8 +186,8 @@ const ViewForum: FC<Props> = (): JSX.Element => {
       field: 'date_of_birth',
       headerName: 'Date of birth',
       type: 'string',
-      minWidth: 100,
-      flex: 1,
+      minWidth: 50,
+      // flex: 1,
       align: 'left',
       headerAlign: 'left',
       disableColumnMenu: true,
@@ -195,8 +196,8 @@ const ViewForum: FC<Props> = (): JSX.Element => {
     {
       field: 'action',
       headerName: 'Action',
-      flex: 1,
-      minWidth: 80,
+      // flex: 1,
+      minWidth: 20,
       align: 'center',
       headerAlign: 'center',
       disableColumnMenu: true,
@@ -216,7 +217,11 @@ const ViewForum: FC<Props> = (): JSX.Element => {
     <>
       <div className='flex flex-col px-1 h-full'>
         <h2 className='font-semibold text-xl'>
-          Forum: <span className='ml-4 text-[#3E9FDA]'>20TCLC_DT4</span>
+          <ArrowBackIosOutlinedIcon
+            onClick={() => navigate('/')}
+            sx={{ fontSize: 20, marginBottom: 0.2, marginRight: 2, cursor: 'pointer' }}
+          />
+          Forum: <span className='ml-4  text-[#3E9FDA]'>20TCLC_DT4</span>
         </h2>
         <div className='my-8 grid xs:grid-cols-2 md:grid-cols-4 gap-4'>
           <div
@@ -273,7 +278,7 @@ const ViewForum: FC<Props> = (): JSX.Element => {
           </div>
         </div>
 
-        <div className='mt-3 w-full overflow-x-hidden'>
+        <div className=' w-full overflow-x-hidden'>
           {tab === 'members' && (
             <Table
               columns={columnsForums}
@@ -290,20 +295,22 @@ const ViewForum: FC<Props> = (): JSX.Element => {
           {tab === 'moderator' && <span>Moderator</span>}
         </div>
       </div>
-      <div className='mt-auto mb-4 flex'>
-        <Button
+      <div className='mt-auto  flex'>
+        {/* <Button
           typeButton='blue'
           onClick={() => navigate('/')}
           className='mr-auto bg-slate-400 rounded-xl border-none '>
           Back
-        </Button>
-        <Button
-          typeButton='blue'
-          onClick={() => setOpenModalEdit(true)}
-          className='ml-auto rounded-xl'>
-          <AiOutlineUserAdd style={{ fontSize: '24px' }} />
-          <span className='ml-2'>Add members</span>
-        </Button>
+        </Button> */}
+        {tab === 'members' && (
+          <Button
+            typeButton='blue'
+            onClick={() => setOpenModalEdit(true)}
+            className='ml-auto rounded-xl'>
+            <AiOutlineUserAdd style={{ fontSize: '24px' }} />
+            <span className='ml-2'>Add members</span>
+          </Button>
+        )}
       </div>
       <ModalAddEdit
         open={openModalEdit}
