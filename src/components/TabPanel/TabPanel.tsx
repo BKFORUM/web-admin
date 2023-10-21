@@ -14,7 +14,7 @@ export default function TabPanel({ children, value, index, ...other }: IProps) {
       id={`simple-tabpanel-${index}`}
       aria-labelledby={`simple-tab-${index}`}
       {...other}>
-      {value === index && <Box sx={{ pt: 2 }}>{children}</Box>}
+      {value === index && <Box>{children}</Box>}
     </div>
   )
 }

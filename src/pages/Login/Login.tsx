@@ -1,4 +1,4 @@
-import React, { FC } from 'react'
+import React, { FC, useEffect } from 'react'
 import logo from '../../assets/images/logobkforum.png'
 import bgImage from '../../assets/images/bg-login-default.jpg'
 import {
@@ -37,14 +37,22 @@ const schema = yup.object().shape({
 
 const Login: FC<Props> = (): JSX.Element => {
   const navigate = useNavigate()
-  const { messageError } = useStoreState(authStateSelector)
-  const { login } = useStoreActions(authActionSelector)
+  const { messageError, isLoginSuccess } = useStoreState(authStateSelector)
+  const { login, setIsLoginSuccess } = useStoreActions(authActionSelector)
   const { setNotifySetting } = useStoreActions(notifyActionSelector)
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
   const { handleSubmit, control } = useForm<IUserLogin>({
     defaultValues: defaultValues,
     resolver: yupResolver(schema),
   })
+
+  useEffect(() => {
+    if (!isLoginSuccess) {
+      setNotifySetting({ show: true, status: 'error', message: messageError })
+      setIsLoginSuccess(true)
+    }
+  }, [isLoginSuccess])
+
   const [showPassword, setShowPassword] = React.useState(false)
 
   const handleClickShowPassword = () => setShowPassword((show) => !show)
@@ -56,14 +64,11 @@ const Login: FC<Props> = (): JSX.Element => {
   const onSubmit = async (data: IUserLogin) => {
     setIsLoading(true)
     const res = await login(data)
-    console.log(res)
     if (res) {
       setIsLoading(false)
       var decoded: any = jwt_decode(res?.accessToken)
-      console.log(decoded)
       const user = {
         name: decoded?.name,
-        // email: decoded?.email,
         exp: decoded?.exp,
         role: decoded?.roles[0],
         access_token: res?.accessToken,
@@ -72,17 +77,10 @@ const Login: FC<Props> = (): JSX.Element => {
       localStorage.setItem('user', JSON.stringify(user))
       setNotifySetting({ show: true, status: 'success', message: 'Login successful' })
       navigate('/forum-management')
+      setIsLoading(false)
     } else {
-      console.log('error', messageError)
-      setNotifySetting({ show: true, status: 'error', message: messageError })
       setIsLoading(false)
     }
-    // try {
-    //   const res = await axios.post('http://52.139.152.154/auth/login', data)
-    //   console.log(res)
-    // } catch (error) {
-    //   console.log(error)
-    // }
   }
   return (
     <div className='h-screen relative'>

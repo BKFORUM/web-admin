@@ -3,7 +3,6 @@ import { GridRenderCellParams, GridSortModel } from '@mui/x-data-grid'
 import { FC, useCallback, useEffect, useState } from 'react'
 import Table from '@components/Table/Table'
 import AddIcon from '@mui/icons-material/Add'
-// import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import Button from '@components/Button/Button'
@@ -12,105 +11,83 @@ import ModalConfirm from '@components/ModalConfirm'
 import ModalAddEdit from '@components/ModalAddEdit'
 import { formatDayVN } from '@utils/functions/formatDay'
 import { useNavigate } from 'react-router-dom'
+import { useStoreActions, useStoreState } from 'easy-peasy'
+import { notifyActionSelector, userActionSelector, userStateSelector } from '@store/index'
+import { IUserView } from '@interfaces/IUser'
 
 interface Props {}
 
-interface IUser {
-  id: number
-  name: string
-  email: string
-  gender: string
-  address: string
-  role: string
-}
-
-const FakeData = [
-  {
-    id: 1,
-    name: 'Trương Quang Khang',
-    email: 'kang@gmail.com',
-    gender: 'Male',
-    address: '20 Nguyễn Huệ, Đà Nẵng',
-    role: 'Student',
-  },
-  {
-    id: 2,
-    name: 'Trương Quang Khang',
-    email: 'kang@gmail.com',
-    gender: 'Male',
-    address: '20 Nguyễn Huệ, Đà Nẵng',
-    role: 'Teacher',
-  },
-  {
-    id: 3,
-    name: 'Trương Quang Khang',
-    email: 'kang@gmail.com',
-    gender: 'Male',
-    address: '20 Nguyễn Huệ, Đà Nẵng',
-    role: 'Student',
-  },
-  {
-    id: 4,
-    name: 'Trương Quang Khang',
-    email: 'kang@gmail.com',
-    gender: 'Male',
-    address: '20 Nguyễn Huệ, Đà Nẵng',
-    role: 'Student',
-  },
-  {
-    id: 5,
-    name: 'Trương Quang Khang',
-    email: 'kang@gmail.com',
-    gender: 'Male',
-    address: '20 Nguyễn Huệ, Đà Nẵng',
-    role: 'Student',
-  },
-]
-
 const UserManagement: FC<Props> = (): JSX.Element => {
   const navigate = useNavigate()
+  const { setNotifySetting } = useStoreActions(notifyActionSelector)
+  const { getAllUser, setIsGetAllUserSuccess } = useStoreActions(userActionSelector)
+  const { messageErrorUser, isGetAllUserSuccess } = useStoreState(userStateSelector)
   const [inputSearch, setInputSearch] = useState<string>('')
-  const [rowsData, setRows] = useState<IUser[]>([])
+  const [rowsData, setRows] = useState<IUserView[]>([])
   const [rowTotal, setRowTotal] = useState(0)
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 10,
   })
-  const [sortModel, setSortModel] = useState<GridSortModel>([])
+  const [sortModel, setSortModel] = useState<GridSortModel>([
+    {
+      field: 'fullName',
+      sort: 'asc',
+    },
+  ])
   const [loading, setLoading] = useState<boolean>(false)
   const [openModalDelete, setOpenModalDelete] = useState(false)
   const [openModalEdit, setOpenModalEdit] = useState(false)
   const [rowSelected, setRowSelected] = useState<number | null>(null)
 
-  useEffect(() => {
+  const getAllUserPage = async (): Promise<void> => {
     setLoading(true)
-    setTimeout(() => {
-      setRowTotal(FakeData.length)
-      setRows(FakeData)
-      setLoading(false)
-    }, 2000)
-  }, [])
+    const res = await getAllUser({
+      search: inputSearch,
+      skip: paginationModel.page * 10,
+      take: paginationModel.pageSize,
+      order: `${sortModel[0]?.field}:${sortModel[0]?.sort}`,
+    })
+    if (res) {
+      setRowTotal(res?.totalRecords)
+      const data = res?.data?.map((item: any, index: number) => ({
+        ...item,
+        tag: paginationModel.page * paginationModel.pageSize + index + 1,
+        address: 'chưa có',
+      }))
+      setRows(data)
+    }
+    setLoading(false)
+  }
+
+  useEffect(() => {
+    getAllUserPage()
+  }, [sortModel, paginationModel])
+
+  useEffect(() => {
+    if (!isGetAllUserSuccess) {
+      setNotifySetting({ show: true, status: 'error', message: messageErrorUser })
+      setIsGetAllUserSuccess(true)
+    }
+  }, [isGetAllUserSuccess])
 
   const handleSortModelChange = useCallback((newSortModel: GridSortModel) => {
-    console.log(newSortModel)
     setSortModel(newSortModel)
-    // Here you save the data you need from the sort model
   }, [])
 
   const handleChangeSearch = (value: string): void => {
-    console.log(value)
     setInputSearch(value)
   }
 
-  const handleAction = (data: any) => {
+  const handleAction = async (data: any): Promise<void> => {
     console.log(data)
     console.log(formatDayVN(data?.date_of_birth))
   }
 
   const columnsUser = [
     {
-      field: 'id',
-      headerName: 'ID',
+      field: 'tag',
+      headerName: 'Tag',
       minWidth: 50,
       maxWidth: 50,
       type: 'number',
@@ -122,7 +99,7 @@ const UserManagement: FC<Props> = (): JSX.Element => {
       disableColumnMenu: true,
     },
     {
-      field: 'name',
+      field: 'fullName',
       headerName: 'Name',
       flex: 2,
       minWidth: 150,
@@ -131,8 +108,8 @@ const UserManagement: FC<Props> = (): JSX.Element => {
       headerAlign: 'left',
       hideable: false,
       renderCell: (params: GridRenderCellParams<any, string>) => (
-        <Tooltip title={params.row.name}>
-          <p className={`text-black line-clamp-1`}>{params.row.name}</p>
+        <Tooltip title={params.row.fullName}>
+          <p className={`text-black line-clamp-1`}>{params.row.fullName}</p>
         </Tooltip>
       ),
     },
@@ -177,18 +154,18 @@ const UserManagement: FC<Props> = (): JSX.Element => {
       ),
     },
     {
-      field: 'role',
+      field: 'type',
       headerName: 'Role',
       type: 'string',
-      minWidth: 100,
+      minWidth: 140,
       flex: 1,
       align: 'left',
       headerAlign: 'left',
       disableColumnMenu: true,
       hideable: false,
       renderCell: (params: GridRenderCellParams<any, string>) => (
-        <p className='text-black bg-slate-200 px-3 py-1 rounded-2xl mr-2 line-clamp-1'>
-          {params.row.role}
+        <p className='text-black text-xs bg-slate-200 px-3 py-1 rounded-2xl line-clamp-1'>
+          {params.row.type}
         </p>
       ),
     },

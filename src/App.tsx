@@ -16,13 +16,6 @@ function App() {
   return (
     <>
       <Routes>
-        {/* <Route
-            path='/'
-            element={
-              <ProtectedRoute>
-                <DefaultLayout />
-              </ProtectedRoute>
-            }> */}
         {routerAdmin.map((route, index) => {
           return (
             <Route
@@ -38,7 +31,6 @@ function App() {
             />
           )
         })}
-        {/* </Route> */}
         <Route
           path='/login'
           element={

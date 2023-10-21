@@ -6,198 +6,107 @@ import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import { FC, useCallback, useEffect, useState } from 'react'
-import { GridRenderCellParams, GridSortModel } from '@mui/x-data-grid'
+import { GridRenderCellParams, GridSortDirection, GridSortModel } from '@mui/x-data-grid'
 import ModalConfirm from '@components/ModalConfirm'
 import ModalAddEdit from '@components/ModalAddEdit'
 import { useNavigate } from 'react-router-dom'
 import { Tooltip } from '@material-ui/core'
-
-interface IForum {
-  id: number
-  forum: string
-  moderator: string
-  total_members: number
-  event: number
-}
-
-const FakeData = [
-  {
-    id: 1,
-    forum: '20TCLC_DT3',
-    moderator: 'Võ Đức Hoàng',
-    total_members: 40,
-    event: 40,
-  },
-  {
-    id: 2,
-    forum: '20TCLC_DT3',
-    moderator: 'Võ Đức Hoàng',
-    total_members: 40,
-    event: 40,
-  },
-  {
-    id: 3,
-    forum: '20TCLC_DT3',
-    moderator: 'Võ Đức Hoàng',
-    total_members: 40,
-    event: 40,
-  },
-  {
-    id: 4,
-    forum: '20TCLC_DT3',
-    moderator: 'Lê Thị Mỹ Hạnh',
-    total_members: 40,
-    event: 40,
-  },
-  {
-    id: 5,
-    forum: '20TCLC_DT3',
-    moderator: 'Trương Quang Khang',
-    total_members: 40,
-    event: 40,
-  },
-  {
-    id: 6,
-    forum: '20TCLC_DT3',
-    moderator: 'Võ Đức Hoàng',
-    total_members: 40,
-    event: 40,
-  },
-  {
-    id: 7,
-    forum: '20TCLC_DT3',
-    moderator: 'Võ Đức Hoàng',
-    total_members: 40,
-    event: 40,
-  },
-  {
-    id: 8,
-    forum: '20TCLC_DT3',
-    moderator: 'Võ Đức Hoàng',
-    total_members: 40,
-    event: 40,
-  },
-  {
-    id: 9,
-    forum: '20TCLC_DT3',
-    moderator: 'Võ Đức Hoàng',
-    total_members: 40,
-    event: 40,
-  },
-  {
-    id: 10,
-    forum: '20TCLC_DT3',
-    moderator: 'Võ Đức Hoàng',
-    total_members: 40,
-    event: 40,
-  },
-  {
-    id: 11,
-    forum: '20TCLC_DT3',
-    moderator: 'Võ Đức Hoàng',
-    total_members: 40,
-    event: 40,
-  },
-  {
-    id: 12,
-    forum: '20TCLC_DT3',
-    moderator: 'Võ Đức Hoàng',
-    total_members: 40,
-    event: 40,
-  },
-  {
-    id: 13,
-    forum: '20TCLC_DT3',
-    moderator: 'Võ Đức Hoàng',
-    total_members: 40,
-    event: 40,
-  },
-  {
-    id: 14,
-    forum: '20TCLC_DT3',
-    moderator: 'Võ Đức Hoàng',
-    total_members: 40,
-    event: 40,
-  },
-  {
-    id: 15,
-    forum: '20TCLC_DT3',
-    moderator: 'Võ Đức Hoàng',
-    total_members: 40,
-    event: 40,
-  },
-  {
-    id: 16,
-    forum: '20TCLC_DT3',
-    moderator: 'Võ Đức Hoàng',
-    total_members: 40,
-    event: 40,
-  },
-  {
-    id: 17,
-    forum: '20TCLC_DT3',
-    moderator: 'Nguyễn Văn B',
-    total_members: 40,
-    event: 40,
-  },
-  {
-    id: 18,
-    forum: '20TCLC_DT3',
-    moderator: 'Nguyễn Văn A',
-    total_members: 40,
-    event: 40,
-  },
-  {
-    id: 19,
-    forum: '20TCLC_DT3',
-    moderator: 'Nguyễn Văn Thịnh',
-    total_members: 40,
-    event: 40,
-  },
-]
+import { useStoreActions, useStoreState } from 'easy-peasy'
+import {
+  forumActionSelector,
+  forumStateSelector,
+  notifyActionSelector,
+} from '@store/index'
+import { IForumTab } from '@interfaces/IForum'
+import { useDebounce } from '@hooks/useDebounce'
 
 interface Props {}
 
 const ForumTab: FC<Props> = (): JSX.Element => {
   const navigate = useNavigate()
-  const [inputSearch, setInputSearch] = useState<string>('')
-  const [rowsData, setRows] = useState<IForum[]>([])
+  const searchParams = new URLSearchParams(window.location.search)
+  const search = searchParams.get('search')
+
+  const { getAllForum, addForum, setIsGetAllForumSuccess, setIsAddForumSuccess } =
+    useStoreActions(forumActionSelector)
+  const { messageErrorForum, isGetAllForumSuccess, isAddForumSuccess } =
+    useStoreState(forumStateSelector)
+  const { setNotifySetting } = useStoreActions(notifyActionSelector)
+
+  const [inputSearch, setInputSearch] = useState<string>(search !== null ? search : '')
+  const [rowsData, setRows] = useState<IForumTab[]>([])
   const [rowTotal, setRowTotal] = useState(0)
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 10,
   })
-  const [sortModel, setSortModel] = useState<GridSortModel>([])
+
+  const [sortModel, setSortModel] = useState<GridSortModel>([
+    {
+      field: 'name',
+      sort: 'asc',
+    },
+  ])
   const [openModalDelete, setOpenModalDelete] = useState(false)
   const [openModalEdit, setOpenModalEdit] = useState(false)
   const [loading, setLoading] = useState<boolean>(false)
-  const [rowSelected, setRowSelected] = useState<number | null>(null)
+  const [rowSelected, setRowSelected] = useState<string | null>(null)
+
+  const debouncedInputValue = useDebounce(inputSearch, 500)
+
+  const addQueryParam = (valueSearch: string): void => {
+    const queryParams = new URLSearchParams()
+    queryParams.set('search', valueSearch.trim())
+    const newURL = `/forum-management?${queryParams.toString()}`
+    window.history.pushState({}, '', newURL)
+  }
+
+  const getAllForumTab = async (): Promise<void> => {
+    setLoading(true)
+    const res = await getAllForum({
+      search: inputSearch,
+      skip: paginationModel.page * 10,
+      take: paginationModel.pageSize,
+      order: `${sortModel[0]?.field}:${sortModel[0]?.sort}`,
+    })
+    if (res) {
+      setRowTotal(res?.totalRecords)
+      const data = res?.data?.map((item: any, index: number) => ({
+        ...item,
+        tag: paginationModel.page * paginationModel.pageSize + index + 1,
+        moderator: item?.moderator?.fullName,
+        total_members: 40,
+        event: 40,
+      }))
+      setRows(data)
+    }
+    setLoading(false)
+  }
 
   useEffect(() => {
-    setLoading(true)
-    const newData = FakeData.map((item, index) => ({
-      ...item,
-      tag: paginationModel.page * paginationModel.pageSize + index + 1,
-    }))
-    setTimeout(() => {
-      setRowTotal(FakeData.length)
-      setRows(newData)
-      setLoading(false)
-    }, 2000)
-  }, [])
+    if (!isGetAllForumSuccess) {
+      setNotifySetting({ show: true, status: 'error', message: messageErrorForum })
+      setIsGetAllForumSuccess(true)
+    }
+  }, [isGetAllForumSuccess])
+
+  useEffect(() => {
+    if (!isAddForumSuccess) {
+      setNotifySetting({ show: true, status: 'error', message: messageErrorForum })
+      setIsAddForumSuccess(true)
+    }
+  }, [isAddForumSuccess])
+
+  useEffect(() => {
+    addQueryParam(inputSearch)
+    getAllForumTab()
+  }, [sortModel, paginationModel, debouncedInputValue])
 
   const handleSortModelChange = useCallback((newSortModel: GridSortModel) => {
     setSortModel(newSortModel)
-    if (newSortModel[0].field === 'moderator') {
-      console.log('moderator.fullName:' + newSortModel[0].sort)
-    } else {
-      console.log(newSortModel[0].field + ':' + newSortModel[0].sort)
-    }
-    // Here you save the data you need from the sort model
   }, [])
 
   const handleChangeSearch = (value: string): void => {
-    console.log(value)
     setInputSearch(value)
   }
 
@@ -205,8 +114,12 @@ const ForumTab: FC<Props> = (): JSX.Element => {
     setOpenModalDelete(false)
   }
 
-  const handleAction = (data: any) => {
-    console.log(data)
+  const handleAction = async (data: any): Promise<void> => {
+    const res = await addForum(data)
+    if (res) {
+      setNotifySetting({ show: true, status: 'success', message: 'Add forum successful' })
+      getAllForumTab()
+    }
   }
 
   const columnsForums = [
@@ -224,8 +137,8 @@ const ForumTab: FC<Props> = (): JSX.Element => {
       disableColumnMenu: true,
     },
     {
-      field: 'forum',
-      headerName: 'Forum',
+      field: 'name',
+      headerName: 'Name',
       flex: 2,
       minWidth: 150,
       editable: false,
@@ -233,8 +146,8 @@ const ForumTab: FC<Props> = (): JSX.Element => {
       headerAlign: 'left',
       hideable: false,
       renderCell: (params: GridRenderCellParams<any, string>) => (
-        <Tooltip title={params.row.forum}>
-          <p className={`text-black line-clamp-1`}>{params.row.forum}</p>
+        <Tooltip title={params.row.name}>
+          <p className={`text-black line-clamp-1`}>{params.row.name}</p>
         </Tooltip>
       ),
     },
@@ -325,7 +238,7 @@ const ForumTab: FC<Props> = (): JSX.Element => {
 
   return (
     <>
-      <div>
+      <div className='mt-4'>
         <div className='flex justify-between items-center '>
           <SearchInput
             value={inputSearch}
@@ -334,11 +247,6 @@ const ForumTab: FC<Props> = (): JSX.Element => {
           <Button
             typeButton='blue'
             onClick={() => {
-              // setLoading(true)
-              // setTimeout(() => {
-              //   setRows(FakeData.slice(0, 5))
-              //   setLoading(false)
-              // }, 2000)
               setRowSelected(null)
               setOpenModalEdit(true)
             }}>

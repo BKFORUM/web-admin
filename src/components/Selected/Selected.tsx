@@ -1,20 +1,28 @@
+import { IOption } from '@interfaces/ITopics'
 import { FormControl, FormHelperText, MenuItem, Select } from '@mui/material'
 import { FC } from 'react'
 
 interface Props {
   error: any
   onChange: any
-  value: any
+  value: string
   empty?: string
+  options?: IOption[]
 }
 
-const options = [
-  { label: 'Ten', value: 10 },
-  { label: 'Twenty', value: 20 },
-  { label: 'Thirty', value: 30 },
-]
+// const options = [
+//   { label: 'Ten', value: 10 },
+//   { label: 'Twenty', value: 20 },
+//   { label: 'Thirty', value: 30 },
+// ]
 
-const Selected: FC<Props> = ({ error, onChange, value, empty }: Props): JSX.Element => {
+const Selected: FC<Props> = ({
+  error,
+  onChange,
+  value,
+  empty,
+  options,
+}: Props): JSX.Element => {
   return (
     <FormControl
       sx={{ width: '100%' }}
@@ -38,10 +46,10 @@ const Selected: FC<Props> = ({ error, onChange, value, empty }: Props): JSX.Elem
         <MenuItem value=''>
           <em>{empty}</em>
         </MenuItem>
-        {options.map((option) => (
+        {options?.map((option) => (
           <MenuItem
-            key={option.value}
-            value={option.value}>
+            key={option.id}
+            value={option.id}>
             {option.label}
           </MenuItem>
         ))}

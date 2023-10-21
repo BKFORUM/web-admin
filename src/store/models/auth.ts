@@ -6,7 +6,10 @@ export interface IAuthModel {
   //MessageError
   messageError: string;
   setMessageError: Action<IAuthModel, string>;
+
   //Login
+  isLoginSuccess: boolean;
+  setIsLoginSuccess: Action<IAuthModel, boolean>;
   login: Thunk<IAuthModel, IUserLogin>;
 }
 
@@ -18,12 +21,18 @@ export const authModel: IAuthModel = persist({
   }),
 
   //Login
+  isLoginSuccess: true,
+  setIsLoginSuccess: action((state, payload) => {
+    state.isLoginSuccess = payload;
+  }),
   login: thunk(async (actions, payload) => {
     return login(payload)
       .then(async (res) => {
+        actions.setIsLoginSuccess(true)
         return res.data;
       })
       .catch((error) => {
+        actions.setIsLoginSuccess(false)
         actions.setMessageError(error?.response?.data?.message)
       });
   }),

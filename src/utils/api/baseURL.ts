@@ -11,7 +11,7 @@ const BaseURL = axios.create({
 
 BaseURL.interceptors.request.use(
   async (config) => {
-    const user: any = localStorage.getItem("user");
+    const user: any = JSON.parse(String(localStorage.getItem("user")));
     if (user?.access_token !== null) {
       config.headers.Authorization = `Bearer ${user?.access_token}`;
     }
@@ -33,8 +33,13 @@ BaseURL.interceptors.response.use(
       // Access Token was expired
       if (err.response.status === 401 && !originalConfig._retry) {
         originalConfig._retry = true;
+        const user: any = JSON.parse(String(localStorage.getItem("user")));
         try {
-          const res = await axios.get('http://52.139.152.154/auth/refresh')
+          const res = await axios.get('http://52.139.152.154/auth/refresh', {
+            headers: {
+              Authorization: `Bearer ${user?.refresh_token}`
+            }
+          })
           if (res) {
             var decoded: any = jwt_decode(res?.data?.accessToken)
             const user = {

@@ -5,8 +5,8 @@ import ModalAddUserForum from './ModalAddUserForum'
 import ModalAddUser from './ModalAddUser'
 interface Props {
   open: boolean
-  handleClose?: any
-  handleAction?: any
+  handleClose: React.Dispatch<React.SetStateAction<boolean>>
+  handleAction: (data: any) => Promise<void>
   data?: any
   setData?: any
   page?: any

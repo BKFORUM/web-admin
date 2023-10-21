@@ -3,124 +3,76 @@ import SearchInput from '@components/SearchInput'
 import Checkbox from '@mui/material/Checkbox'
 import { FC, useEffect, useRef, useState } from 'react'
 import avatar from '../../../assets/images/test.jpg'
+import { useStoreActions } from 'easy-peasy'
+import { userActionSelector } from '@store/index'
+import { IViewUserAddList } from '@interfaces/IForum'
+import { useParams } from 'react-router-dom'
 
 interface Props {
-  handleAction?: any
-  handleClose?: any
+  handleAction: (data: any) => Promise<void>
+  handleClose: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-interface IUserAdd {
-  id: number
-  name: string
-  checked: boolean
-  avatar: any
-  email: string
-}
-
-const FakeData = [
-  {
-    id: 102200155,
-    name: 'Nguyễn Văn Thịnh',
-    avatar: avatar,
-    email: '102200155@sv1.dut.udn.vn',
-  },
-  {
-    id: 102200156,
-    name: 'Nguyễn Văn Thịnh',
-    avatar: avatar,
-    email: '102200155@sv1.dut.udn.vn',
-  },
-  {
-    id: 102200157,
-    name: 'Nguyễn Văn Thịnh',
-    avatar: avatar,
-    email: '102200155@sv1.dut.udn.vn',
-  },
-  {
-    id: 102200158,
-    name: 'Nguyễn Văn Thịnh',
-    avatar: avatar,
-    email: '102200155@sv1.dut.udn.vn',
-  },
-  {
-    id: 102200159,
-    name: 'Nguyễn Văn Thịnh',
-    avatar: avatar,
-    email: '102200155@sv1.dut.udn.vn',
-  },
-  {
-    id: 102200160,
-    name: 'Nguyễn Văn Thịnh',
-    avatar: avatar,
-    email: '102200155@sv1.dut.udn.vn',
-  },
-  {
-    id: 102200161,
-    name: 'Nguyễn Văn Thịnh',
-    avatar: avatar,
-    email: '102200155@sv1.dut.udn.vn',
-  },
-  {
-    id: 102200162,
-    name: 'Nguyễn Văn Thịnh',
-    avatar: avatar,
-    email: '102200155@sv1.dut.udn.vn',
-  },
-  {
-    id: 102200163,
-    name: 'Nguyễn Văn Thịnh',
-    avatar: avatar,
-    email: '102200155@sv1.dut.udn.vn',
-  },
-  {
-    id: 102200164,
-    name: 'Nguyễn Văn Thịnh',
-    avatar: avatar,
-    email: '102200155@sv1.dut.udn.vn',
-  },
-
-  {
-    id: 102200165,
-    name: 'Nguyễn Văn Thịnh',
-    avatar: avatar,
-    email: '102200155@sv1.dut.udn.vn',
-  },
-  {
-    id: 102200166,
-    name: 'Nguyễn Văn Thịnh',
-    avatar: avatar,
-    email: '102200155@sv1.dut.udn.vn',
-  },
-  {
-    id: 102200167,
-    name: 'Nguyễn Văn Thịnh',
-    avatar: avatar,
-    email: '102200155@sv1.dut.udn.vn',
-  },
-  {
-    id: 102200168,
-    name: 'Nguyễn Văn Thịnh',
-    avatar: avatar,
-    email: '102200155@sv1.dut.udn.vn',
-  },
-]
-
-const ModalAddUserForum: FC<Props> = ({ handleClose }: Props): JSX.Element => {
+const ModalAddUserForum: FC<Props> = ({
+  handleClose,
+  handleAction,
+}: Props): JSX.Element => {
+  const { id } = useParams()
+  const { getAllUser } = useStoreActions(userActionSelector)
   const [inputSearch, setInputSearch] = useState<string>('')
-  const [data, setData] = useState<IUserAdd[]>([])
-  const [userSelected, setUserSelected] = useState<IUserAdd[]>([])
+  const [data, setData] = useState<IViewUserAddList[]>([])
+  const [userSelected, setUserSelected] = useState<IViewUserAddList[]>([])
+  const [isLoading, setIsLoading] = useState<boolean | null>(null)
   const ref = useRef<HTMLDivElement>(null)
+
+  const getAllUserNoForumCurrent = async (): Promise<void> => {
+    setIsLoading(true)
+    const res = await getAllUser({
+      // search: inputSearch,
+      take: 100000000,
+      forumId: id,
+      isInForum: false,
+    })
+    if (res) {
+      console.log(res)
+      const data = res?.data?.map((item: any) => ({
+        ...item,
+        avatarUrl: avatar,
+        checked: false,
+      }))
+      setData(data)
+      setIsLoading(false)
+    } else {
+      setIsLoading(false)
+    }
+  }
 
   const scrollToLast = () => {
     const lastChildElement = ref.current?.lastElementChild
     lastChildElement?.scrollIntoView({ behavior: 'smooth' })
   }
 
+  const handleChangeSearch = (value: string): void => {
+    setInputSearch(value)
+  }
+
+  const handleCheckboxChange = (itemId: string) => {
+    setData((prevItems) =>
+      prevItems.map((item) =>
+        item.id === itemId ? { ...item, checked: !item.checked } : item,
+      ),
+    )
+  }
+
+  const handleAdd = (): void => {
+    const userIds = userSelected.map((item) => item.id)
+    handleAction({ userIds })
+  }
+
+  const label = { inputProps: { 'aria-label': 'Checkbox demo' } }
+
   useEffect(() => {
-    const newData = FakeData.map((item) => {
-      return { ...item, checked: false }
-    })
-    setData(newData)
+    getAllUserNoForumCurrent()
   }, [])
 
   useEffect(() => {
@@ -131,26 +83,12 @@ const ModalAddUserForum: FC<Props> = ({ handleClose }: Props): JSX.Element => {
   useEffect(() => {
     scrollToLast()
   }, [userSelected])
-
-  const handleChangeSearch = (value: string): void => {
-    setInputSearch(value)
-  }
-
-  const handleCheckboxChange = (itemId: number) => {
-    setData((prevItems) =>
-      prevItems.map((item) =>
-        item.id === itemId ? { ...item, checked: !item.checked } : item,
-      ),
-    )
-  }
-
-  const label = { inputProps: { 'aria-label': 'Checkbox demo' } }
   return (
     <div className='flex flex-col gap-2 w-[500px] relative'>
       <h2 className='m-auto text-xl font-semibold'>Add Members</h2>
       <span
         className='absolute top-0 right-0 text-xl text-gray-500 cursor-pointer'
-        onClick={() => handleClose()}>
+        onClick={() => handleClose(false)}>
         X
       </span>
       <div className='w-[500px]'>
@@ -172,19 +110,19 @@ const ModalAddUserForum: FC<Props> = ({ handleClose }: Props): JSX.Element => {
             userSelected?.map((item, index) => (
               <div
                 key={index}
-                className='flex flex-col gap-1 items-start justify-center w-20 relative'>
+                className='flex flex-col gap-1 items-start  w-20 relative mt-'>
                 <div className='h-12 w-12  rounded-[50%] overflow-hidden ml-3'>
                   <img
-                    src={item.avatar}
+                    src={item.avatarUrl}
                     alt='avatar'
                   />
                   <span
                     onClick={() => handleCheckboxChange(item.id)}
-                    className='absolute top-2.5 right-2.5 cursor-pointer text-gray-500 bg-white px-1.5 text-sm rounded-[50%] hover:bg-gray-200 transition-all duration-200 '>
+                    className='absolute top-0.5 right-2.5 cursor-pointer text-gray-500 bg-white px-1.5 text-sm rounded-[50%] hover:bg-gray-200 transition-all duration-200 '>
                     X
                   </span>
                 </div>
-                <span className='text-sm text-center'>{item?.name}</span>
+                <span className='text-sm text-center'>{item?.fullName}</span>
               </div>
             ))}
         </div>
@@ -194,37 +132,44 @@ const ModalAddUserForum: FC<Props> = ({ handleClose }: Props): JSX.Element => {
           data.length > 4 && 'overflow-y-scroll'
         }`}>
         <span className='text-lg font-semibold'>List user</span>
-        {data?.map((item, index) => {
-          return (
-            <div
-              key={index}
-              className={`flex justify-between items-center cursor-pointer rounded-xl py-1.5 ${
-                item.checked ? 'bg-slate-100' : 'hover:bg-slate-100'
-              } `}
-              onClick={() => handleCheckboxChange(item.id)}>
-              <div className='flex gap-2 items-center'>
-                <div className='h-12 w-12  rounded-[50%] overflow-hidden ml-3'>
-                  <img
-                    src={item.avatar}
-                    alt='avatar'
-                  />
+        {isLoading && <span>Loading</span>}
+        {data.length === 0 && <span>ko có user</span>}
+        {!isLoading &&
+          data?.map((item, index) => {
+            return (
+              <div
+                key={index}
+                className={`flex justify-between items-center cursor-pointer rounded-xl py-1.5 ${
+                  item.checked ? 'bg-slate-100' : 'hover:bg-slate-100'
+                } `}
+                onClick={() => handleCheckboxChange(item.id)}>
+                <div className='flex gap-2 items-center'>
+                  <div className='h-12 w-12  rounded-[50%] overflow-hidden ml-3'>
+                    <img
+                      src={item.avatarUrl}
+                      alt='avatar'
+                    />
+                  </div>
+                  <span>
+                    {item?.fullName} <span>({item.email})</span>
+                  </span>
                 </div>
-                <span>
-                  {item?.name} <span>({item.email})</span>
-                </span>
-              </div>
 
-              <Checkbox
-                {...label}
-                checked={item?.checked}
-              />
-            </div>
-          )
-        })}
+                <Checkbox
+                  {...label}
+                  checked={item?.checked}
+                />
+              </div>
+            )
+          })}
       </div>
 
       <Button
         typeButton='primary'
+        onClick={() => {
+          handleAdd()
+          handleClose(false)
+        }}
         disabled={userSelected.length === 0 ? true : false}
         className={`mt-4`}>
         Add

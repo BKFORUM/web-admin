@@ -43,13 +43,12 @@ const Table = ({
           '& .MuiDataGrid-columnHeaderTitle': {
             fontWeight: 'bold',
           },
-          // height: '100%',
           '& .MuiDataGrid-footerContainer': {
             display: `${hiddenFooter ? 'none' : ''}`,
           },
           '& .MuiDataGrid-virtualScroller': {
-            height: `${hiddenFooter && rows.length > 4 ? '280px' : ''}`,
-            overflow: `${hiddenFooter && rows.length > 4 ? 'overlay !important' : ''}`,
+            height: `${hiddenFooter && rows.length > 4 ? '280px' : 'h-auto'}`,
+            overflow: `${hiddenFooter && rows.length > 4 ? 'auto !important' : ''}`,
             scrollbarGutter: 'stable',
           },
         }}
@@ -66,7 +65,7 @@ const Table = ({
         getRowHeight={() => 'auto'}
         autoHeight
         pageSizeOptions={[10]}
-        // paginationMode='server'
+        paginationMode='server'
         paginationModel={paginationModel}
         onPaginationModelChange={onPaginationModelChange}
       />

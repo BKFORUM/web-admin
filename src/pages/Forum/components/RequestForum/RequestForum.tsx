@@ -8,52 +8,14 @@ import DoneIcon from '@mui/icons-material/Done'
 import ClearIcon from '@mui/icons-material/Clear'
 
 import { IconButton, Menu, MenuItem, Tooltip } from '@mui/material'
+import { IRequestForum } from '@interfaces/IForum'
+import { useStoreActions, useStoreState } from 'easy-peasy'
+import {
+  forumActionSelector,
+  forumStateSelector,
+  notifyActionSelector,
+} from '@store/index'
 interface Props {}
-interface IRequestForum {
-  id: number
-  name: string
-  creator: string
-  categories: string[]
-  create_at: string
-}
-
-const FakeData = [
-  {
-    id: 1,
-    name: 'Diễn đàng sv khoa IT',
-    creator: 'Truong Quang Khang',
-    categories: ['hoc tap'],
-    create_at: '1-10-2023',
-  },
-  {
-    id: 2,
-    name: 'Diễn đàng sv khoa IT',
-    creator: 'Truong Quang Khang',
-    categories: ['hoc tap'],
-    create_at: '1-10-2023',
-  },
-  {
-    id: 3,
-    name: 'Diễn đàng sv khoa IT',
-    creator: 'Truong Quang Khang',
-    categories: ['hoc tap'],
-    create_at: '1-10-2023',
-  },
-  {
-    id: 4,
-    name: 'Diễn đàng sv khoa IT',
-    creator: 'Truong Quang Khang',
-    categories: ['hoc tap', 'the thao', 'am nhac', 'xa hoi'],
-    create_at: '1-10-2023',
-  },
-  {
-    id: 5,
-    name: 'Diễn đàng sv khoa IT',
-    creator: 'Truong Quang Khang',
-    categories: ['hoc tap', 'game'],
-    create_at: '1-10-2023',
-  },
-]
 
 function ActionsMenu({ params }: any) {
   const [anchorEl, setAnchorEl] = useState(null)
@@ -113,6 +75,9 @@ function ActionsMenu({ params }: any) {
 }
 
 const RequestForum: FC<Props> = (): JSX.Element => {
+  const { getAllForum, setIsGetAllForumSuccess } = useStoreActions(forumActionSelector)
+  const { messageErrorForum, isGetAllForumSuccess } = useStoreState(forumStateSelector)
+  const { setNotifySetting } = useStoreActions(notifyActionSelector)
   const [inputSearch, setInputSearch] = useState<string>('')
   const [rowsData, setRows] = useState<IRequestForum[]>([])
   const [rowTotal, setRowTotal] = useState(0)
@@ -120,30 +85,54 @@ const RequestForum: FC<Props> = (): JSX.Element => {
     page: 0,
     pageSize: 10,
   })
-  const [sortModel, setSortModel] = useState<GridSortModel>([])
+  const [sortModel, setSortModel] = useState<GridSortModel>([
+    {
+      field: 'name',
+      sort: 'asc',
+    },
+  ])
   const [loading, setLoading] = useState<boolean>(false)
 
-  useEffect(() => {
+  const getAllRequestForum = async (): Promise<void> => {
     setLoading(true)
-    const newData = FakeData.map((item, index) => ({
-      ...item,
-      tag: paginationModel.page * paginationModel.pageSize + index + 1,
-    }))
-    setTimeout(() => {
-      setRowTotal(FakeData.length)
-      setRows(newData)
+    const res = await getAllForum({
+      search: inputSearch,
+      skip: paginationModel.page * 10,
+      take: paginationModel.pageSize,
+      isPending: true,
+      order: `${sortModel[0]?.field}:${sortModel[0]?.sort}`,
+    })
+    if (res) {
+      console.log(res)
+      setRowTotal(res?.totalRecords)
+      const data = res?.data?.map((item: any, index: number) => ({
+        ...item,
+        tag: paginationModel.page * paginationModel.pageSize + index + 1,
+        moderator: item?.moderator?.fullName,
+      }))
+      setRows(data)
       setLoading(false)
-    }, 2000)
-  }, [])
+    } else {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    getAllRequestForum()
+  }, [sortModel, paginationModel])
+
+  useEffect(() => {
+    if (!isGetAllForumSuccess) {
+      setNotifySetting({ show: true, status: 'error', message: messageErrorForum })
+      setIsGetAllForumSuccess(true)
+    }
+  }, [isGetAllForumSuccess])
 
   const handleSortModelChange = useCallback((newSortModel: GridSortModel) => {
-    console.log(newSortModel)
     setSortModel(newSortModel)
-    // Here you save the data you need from the sort model
   }, [])
 
   const handleChangeSearch = (value: string): void => {
-    console.log(value)
     setInputSearch(value)
   }
 
@@ -177,8 +166,8 @@ const RequestForum: FC<Props> = (): JSX.Element => {
       ),
     },
     {
-      field: 'creator',
-      headerName: 'Creator',
+      field: 'moderator',
+      headerName: 'Moderator',
       type: 'string',
       flex: 2,
       minWidth: 150,
@@ -186,13 +175,13 @@ const RequestForum: FC<Props> = (): JSX.Element => {
       headerAlign: 'left',
       hideable: false,
       renderCell: (params: GridRenderCellParams<any, string>) => (
-        <Tooltip title={params.row.creator}>
-          <p className={`text-black line-clamp-1`}>{params.row.creator}</p>
+        <Tooltip title={params.row.moderator}>
+          <p className={`text-black line-clamp-1`}>{params.row.moderator}</p>
         </Tooltip>
       ),
     },
     {
-      field: 'categories',
+      field: 'topics',
       headerName: 'Categories',
       minWidth: 100,
       flex: 2,
@@ -200,23 +189,23 @@ const RequestForum: FC<Props> = (): JSX.Element => {
       headerAlign: 'left',
       hideable: false,
       renderCell: (params: GridRenderCellParams<any, string>) =>
-        params.row.categories.length > 2 ? (
+        params.row.topics.length > 2 ? (
           <div className='flex'>
-            {params.row.categories.slice(0, 2).map((item: string, index: number) => (
+            {params.row.topics.slice(0, 2).map((item: string, index: number) => (
               <p
                 key={index}
                 className='text-black bg-slate-200 px-3 py-1 rounded-2xl mr-2 line-clamp-1'>
                 {item}
               </p>
             ))}
-            <Tooltip title={params.row.categories.slice(2).join(', ')}>
+            <Tooltip title={params.row.topics.slice(2).join(', ')}>
               <p className='text-black bg-slate-200 px-3 py-1 rounded-2xl mr-2 line-clamp-1'>
-                + {params.row.categories.length - 2}
+                + {params.row.topics.length - 2}
               </p>
             </Tooltip>
           </div>
         ) : (
-          params.row.categories.map((item: string, index: number) => (
+          params.row.topics.map((item: string, index: number) => (
             <p
               key={index}
               className='text-black bg-slate-200 px-3 py-1 rounded-2xl mr-2 line-clamp-1'>
@@ -226,7 +215,7 @@ const RequestForum: FC<Props> = (): JSX.Element => {
         ),
     },
     {
-      field: 'create_at',
+      field: 'createAt',
       headerName: 'Create at',
       type: 'string',
       minWidth: 100,
@@ -252,7 +241,7 @@ const RequestForum: FC<Props> = (): JSX.Element => {
     },
   ]
   return (
-    <div>
+    <div className='mt-4'>
       <div className='flex justify-between items-center '>
         <SearchInput
           value={inputSearch}

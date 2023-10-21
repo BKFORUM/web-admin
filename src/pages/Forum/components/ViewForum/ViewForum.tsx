@@ -5,129 +5,106 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import ArrowBackIosOutlinedIcon from '@mui/icons-material/ArrowBackIosOutlined'
 import Table from '@components/Table'
 import Button from '@components/Button/Button'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { AiOutlineUserAdd } from 'react-icons/ai'
 import ModalAddEdit from '@components/ModalAddEdit'
+import { useStoreActions, useStoreState } from 'easy-peasy'
+import {
+  forumActionSelector,
+  forumStateSelector,
+  notifyActionSelector,
+  userActionSelector,
+  userStateSelector,
+} from '@store/index'
+import { IUserForum } from '@interfaces/IUser'
+import { formatDateFormDateLocal } from '@utils/functions/formatDay'
 
 interface Props {}
 
-interface IUser {
-  id: number
-  name: string
-  email: string
-  phone_number: string
-  date_of_birth: string
-}
-
-const FakeData = [
-  {
-    id: 1,
-    name: 'Diễn đàng sv khoa IT',
-    email: '102200175@sv1.dut.dn.vn',
-    phone_number: '03262541254',
-    date_of_birth: '1-10-2023',
-  },
-  {
-    id: 2,
-    name: 'Diễn đàng sv khoa IT',
-    email: '102200175@sv1.dut.dn.vn',
-    phone_number: '03262541254',
-    date_of_birth: '1-10-2023',
-  },
-  {
-    id: 3,
-    name: 'Diễn đàng sv khoa IT',
-    email: '102200175@sv1.dut.dn.vn',
-    phone_number: '03262541254',
-    date_of_birth: '1-10-2023',
-  },
-  {
-    id: 4,
-    name: 'Diễn đàng sv khoa IT',
-    email: '102200175@sv1.dut.dn.vn',
-    phone_number: '03262541254',
-    date_of_birth: '1-10-2023',
-  },
-  {
-    id: 5,
-    name: 'Diễn đàng sv khoa IT',
-    email: '102200175@sv1.dut.dn.vn',
-    phone_number: '03262541254',
-    date_of_birth: '1-10-2023',
-  },
-  {
-    id: 6,
-    name: 'Diễn đàng sv khoa IT',
-    email: '102200175@sv1.dut.dn.vn',
-    phone_number: '03262541254',
-    date_of_birth: '1-10-2023',
-  },
-  {
-    id: 7,
-    name: 'Diễn đàng sv khoa IT',
-    email: '102200175@sv1.dut.dn.vn',
-    phone_number: '03262541254',
-    date_of_birth: '1-10-2023',
-  },
-  {
-    id: 8,
-    name: 'Diễn đàng sv khoa IT',
-    email: '102200175@sv1.dut.dn.vn',
-    phone_number: '03262541254',
-    date_of_birth: '1-10-2023',
-  },
-
-  // {
-  //   id: 9,
-  //   name: 'Diễn đàng sv khoa IT',
-  //   email: '102200175@sv1.dut.dn.vn',
-  //   phone_number: '03262541254',
-  //   date_of_birth: '1-10-2023',
-  // },
-  // {
-  //   id: 10,
-  //   name: 'Diễn đàng sv khoa IT',
-  //   email: '102200175@sv1.dut.dn.vn',
-  //   phone_number: '03262541254',
-  //   date_of_birth: '1-10-2023',
-  // },
-  // {
-  //   id: 11,
-  //   name: 'Diễn đàng sv khoa IT',
-  //   email: '102200175@sv1.dut.dn.vn',
-  //   phone_number: '03262541254',
-  //   date_of_birth: '1-10-2023',
-  // },
-]
-
 const ViewForum: FC<Props> = (): JSX.Element => {
   const navigate = useNavigate()
-  const [rowsData, setRows] = useState<IUser[]>([])
+  const { id } = useParams()
+
+  const { isGetAllUserSuccess, messageErrorUser } = useStoreState(userStateSelector)
+  const { getAllUser, setIsGetAllUserSuccess } = useStoreActions(userActionSelector)
+  const { addUserToForum, setIsAddUserToForumSuccess } =
+    useStoreActions(forumActionSelector)
+  const { messageErrorForum, isAddUserToForumSuccess } = useStoreState(forumStateSelector)
+  const { setNotifySetting } = useStoreActions(notifyActionSelector)
+  const [rowsData, setRows] = useState<IUserForum[]>([])
   const [rowTotal, setRowTotal] = useState(0)
-  const [sortModel, setSortModel] = useState<GridSortModel>([])
+  const [sortModel, setSortModel] = useState<GridSortModel>([
+    {
+      field: 'fullName',
+      sort: 'asc',
+    },
+  ])
   const [loading, setLoading] = useState<boolean>(false)
   const [tab, setTab] = useState<string>('members')
-  const [openModalEdit, setOpenModalEdit] = useState(false)
+  const [openModalEdit, setOpenModalEdit] = useState<boolean>(false)
+
+  const getAllUserPage = async (): Promise<void> => {
+    setLoading(true)
+    const res = await getAllUser({
+      take: 100000000,
+      order: `${sortModel[0]?.field}:${sortModel[0]?.sort}`,
+      forumId: id,
+      isInForum: true,
+    })
+    if (res) {
+      setRowTotal(res?.totalRecords)
+      const data = res?.data?.map((item: any, index: number) => ({
+        ...item,
+        tag: index + 1,
+        phone_number: 'chưa có lun',
+      }))
+      setRows(data)
+      setLoading(false)
+    } else {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
-    setLoading(true)
-    setTimeout(() => {
-      setRowTotal(FakeData.length)
-      setRows(FakeData)
-      setLoading(false)
-    }, 2000)
-  }, [])
+    getAllUserPage()
+  }, [sortModel])
+
+  useEffect(() => {
+    if (!isGetAllUserSuccess) {
+      setNotifySetting({ show: true, status: 'error', message: messageErrorUser })
+      setIsGetAllUserSuccess(true)
+    }
+  }, [isGetAllUserSuccess])
+
+  useEffect(() => {
+    if (!isAddUserToForumSuccess) {
+      setNotifySetting({ show: true, status: 'error', message: messageErrorForum })
+      setIsAddUserToForumSuccess(true)
+    }
+  }, [isAddUserToForumSuccess])
 
   const handleSortModelChange = useCallback((newSortModel: GridSortModel) => {
-    console.log(newSortModel)
     setSortModel(newSortModel)
-    // Here you save the data you need from the sort model
   }, [])
 
-  const columnsForums = [
+  const handleAddUserToForum = async (data: any): Promise<void> => {
+    if (id !== undefined) {
+      const res = await addUserToForum({ id: id, userIds: data })
+      if (res) {
+        setNotifySetting({
+          show: true,
+          status: 'success',
+          message: 'Add user to forum successful !',
+        })
+        getAllUserPage()
+      }
+    }
+  }
+
+  const columnsUserForums = [
     {
-      field: 'id',
-      headerName: 'ID',
+      field: 'tag',
+      headerName: 'Tag',
       minWidth: 50,
       maxWidth: 50,
       type: 'number',
@@ -139,7 +116,7 @@ const ViewForum: FC<Props> = (): JSX.Element => {
       disableColumnMenu: true,
     },
     {
-      field: 'name',
+      field: 'fullName',
       headerName: 'Name',
       flex: 2,
       minWidth: 150,
@@ -148,8 +125,8 @@ const ViewForum: FC<Props> = (): JSX.Element => {
       headerAlign: 'left',
       hideable: false,
       renderCell: (params: GridRenderCellParams<any, string>) => (
-        <Tooltip title={params.row.name}>
-          <p className={`text-black line-clamp-1`}>{params.row.name}</p>
+        <Tooltip title={params.row.fullName}>
+          <p className={`text-black line-clamp-1`}>{params.row.fullName}</p>
         </Tooltip>
       ),
     },
@@ -183,15 +160,23 @@ const ViewForum: FC<Props> = (): JSX.Element => {
       ),
     },
     {
-      field: 'date_of_birth',
+      field: 'dateOfBirth',
       headerName: 'Date of birth',
       type: 'string',
       minWidth: 50,
       // flex: 1,
+      // formatDateFormDateLocal
       align: 'left',
       headerAlign: 'left',
       disableColumnMenu: true,
       hideable: false,
+      renderCell: (params: GridRenderCellParams<any, string>) => (
+        <Tooltip title={formatDateFormDateLocal(params.row.dateOfBirth)}>
+          <p className={`text-black line-clamp-1`}>
+            {formatDateFormDateLocal(params.row.dateOfBirth)}
+          </p>
+        </Tooltip>
+      ),
     },
     {
       field: 'action',
@@ -281,7 +266,7 @@ const ViewForum: FC<Props> = (): JSX.Element => {
         <div className=' w-full overflow-x-hidden'>
           {tab === 'members' && (
             <Table
-              columns={columnsForums}
+              columns={columnsUserForums}
               rows={rowsData}
               sortModel={sortModel}
               onSortModelChange={handleSortModelChange}
@@ -296,12 +281,6 @@ const ViewForum: FC<Props> = (): JSX.Element => {
         </div>
       </div>
       <div className='mt-auto  flex'>
-        {/* <Button
-          typeButton='blue'
-          onClick={() => navigate('/')}
-          className='mr-auto bg-slate-400 rounded-xl border-none '>
-          Back
-        </Button> */}
         {tab === 'members' && (
           <Button
             typeButton='blue'
@@ -314,8 +293,8 @@ const ViewForum: FC<Props> = (): JSX.Element => {
       </div>
       <ModalAddEdit
         open={openModalEdit}
-        handleClose={() => setOpenModalEdit(false)}
-        // handleAction={handleAction}
+        handleClose={setOpenModalEdit}
+        handleAction={handleAddUserToForum}
         page='VIEW_FORUM'
       />
     </>

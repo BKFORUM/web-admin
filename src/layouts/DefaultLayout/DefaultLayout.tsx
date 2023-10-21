@@ -9,7 +9,7 @@ const DefaultLayout: FC<Props> = ({ children }: Props): JSX.Element => {
   const [open, setOpen] = useState<boolean>(false)
   return (
     <div
-      className='wrapper overflow-x-hidden bg-gray-100 dark:bg-gray-900 dark:bg-opacity-40 '
+      className='wrapper overflow-x-hidden bg-gray-100'
       dir='ltr'>
       <nav
         id='sidebar-menu'

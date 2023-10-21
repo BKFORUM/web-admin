@@ -7,15 +7,21 @@ import {
 
 import { authModel as auth, IAuthModel } from "./models/auth";
 import { notifyModel as notify, INotifyModel } from "./models/notify";
+import { forumModel as forum, IForumModel } from "./models/forum";
+import { userModel as user, IUserModel } from "./models/user";
 
 export interface IStoreModel {
     auth: IAuthModel;
     notify: INotifyModel
+    forum: IForumModel;
+    user: IUserModel
 }
 
 const storeModel: IStoreModel = {
     auth,
-    notify
+    notify,
+    forum,
+    user
 }
 
 export const { useStoreActions, useStoreState, useStoreDispatch, useStore } =
@@ -31,6 +37,15 @@ export const authActionSelector = (state: IActionMapper) => state.auth;
 // Notify
 export const notifyStateSelector = (state: IStateMapper) => state.notify;
 export const notifyActionSelector = (state: IActionMapper) => state.notify;
+
+// Forum
+export const forumStateSelector = (state: IStateMapper) => state.forum;
+export const forumActionSelector = (state: IActionMapper) => state.forum;
+
+//User
+export const userStateSelector = (state: IStateMapper) => state.user;
+export const userActionSelector = (state: IActionMapper) => state.user;
+
 
 const store = createStore(storeModel, {
     name: "store",

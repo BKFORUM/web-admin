@@ -6,11 +6,36 @@ import FooterModal from '../FooterModal'
 import TextFieldV2 from '@components/TextFieldV2'
 import DateTimePicker from '@components/DateTimePicker'
 import Selected from '@components/Selected'
+import { IOption } from '@interfaces/ITopics'
+import { Gender, ROLE } from '@commom/enum'
+import AutocompleteCustom from '@components/Autocomplete/Autocomplete'
 
 interface Props {
   handleAction?: any
   handleClose?: any
 }
+
+const optionsGender: IOption[] = [
+  {
+    id: Gender.MALE,
+    label: Gender.MALE,
+  },
+  {
+    id: Gender.FEMALE,
+    label: Gender.FEMALE,
+  },
+]
+
+const optionsRole: IOption[] = [
+  {
+    id: ROLE.STUDENT,
+    label: ROLE.STUDENT,
+  },
+  {
+    id: ROLE.TEACHER,
+    label: ROLE.TEACHER,
+  },
+]
 
 interface IUser {
   id?: number
@@ -55,6 +80,21 @@ const ModalAddUser: FC<Props> = ({ handleClose, handleAction }: Props): JSX.Elem
   const onSubmit = async (data: IUser) => {
     handleAction(data)
   }
+
+  const optionsFaculty = [
+    {
+      id: 'kakakaka',
+      label: 'Kakakak',
+    },
+    {
+      id: 'akdlaskdlkald',
+      label: 'dábdbasdasd',
+    },
+    {
+      id: 'aaaaa',
+      label: 'aaawwww',
+    },
+  ]
 
   return (
     <div className='flex flex-col gap-2 w-[450px] relative'>
@@ -120,6 +160,7 @@ const ModalAddUser: FC<Props> = ({ handleClose, handleAction }: Props): JSX.Elem
                     error={error}
                     onChange={onChange}
                     value={value}
+                    options={optionsGender}
                     empty='Select gender'
                   />
                 )}
@@ -138,11 +179,12 @@ const ModalAddUser: FC<Props> = ({ handleClose, handleAction }: Props): JSX.Elem
                 name='faculty'
                 control={control}
                 render={({ field: { onChange, value }, fieldState: { error } }) => (
-                  <Selected
-                    error={error}
+                  <AutocompleteCustom
                     onChange={onChange}
                     value={value}
-                    empty='Select faculty'
+                    error={error}
+                    options={optionsFaculty}
+                    placeholder='Select moderator'
                   />
                 )}
               />
@@ -161,6 +203,7 @@ const ModalAddUser: FC<Props> = ({ handleClose, handleAction }: Props): JSX.Elem
                     error={error}
                     onChange={onChange}
                     value={value}
+                    options={optionsRole}
                     empty='Select role'
                   />
                 )}
