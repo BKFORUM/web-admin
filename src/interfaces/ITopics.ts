@@ -4,7 +4,13 @@ export interface ITopic {
     displayName: string;
 }
 
+export interface IFaculty {
+    id: string;
+    name: string;
+    displayName: string;
+}
+
 export interface IOption {
     id: string;
-    label: string;
+    name: string;
 }

@@ -1,27 +1,12 @@
 import Button from '@components/Button/Button'
 import { Box } from '@mui/material'
 interface IProps {
-  handleSubmitAction?: any
-  data?: any
-  page?: any
-  handleClose?: any
+  handleSubmitAction: (data: any) => Promise<void>
+  handleClose: React.Dispatch<React.SetStateAction<boolean>>
+  isEdit?: boolean
 }
 
-export default function FooterModal({
-  handleSubmitAction,
-  data,
-  page,
-  handleClose,
-}: IProps) {
-  const checkbtnPage = data?.deliveryOrderNo ? 'UPDATE' : 'CREATE'
-
-  const checkbtnFunction =
-    data?.deliveryOrderNo ||
-    data?.userId ||
-    (data?.supplierId && page === 'CONTACT') ||
-    data?.id
-      ? 'Update'
-      : 'Create'
+export default function FooterModal({ handleSubmitAction, handleClose, isEdit }: IProps) {
   return (
     <div>
       <Box
@@ -43,12 +28,12 @@ export default function FooterModal({
           onSubmit={handleSubmitAction}
           disabled={false}
           loading={false}>
-          {page === 'PAYABLE' ? checkbtnPage : checkbtnFunction}
+          {isEdit ? 'Save' : 'Add'}
         </Button>
 
         <Button
           type='button'
-          onClick={handleClose}
+          onClick={() => handleClose(false)}
           className='transition-all duration-300 bg-gray-500 hover:bg-gray-800 text-white px-6 py-1.5 shadow rounded-2xl border-none'>
           Cancel
         </Button>

@@ -17,28 +17,23 @@ import {
   userActionSelector,
   userStateSelector,
 } from '@store/index'
-interface Props {
+import { IFormDataForum } from '@interfaces/IForum'
+interface Props<T> {
   handleAction: (data: any) => Promise<void>
   handleClose: React.Dispatch<React.SetStateAction<boolean>>
-  rowSelected?: any
+  rowSelected?: T
 }
 
 const optionTypes: IOption[] = [
   {
     id: Type.HOMEROOM,
-    label: Type.HOMEROOM,
+    name: Type.HOMEROOM,
   },
   {
     id: Type.TOPIC,
-    label: Type.TOPIC,
+    name: Type.TOPIC,
   },
 ]
-interface IFormDataForum {
-  name: string
-  moderatorId: string
-  type: string
-  topicIds: string[]
-}
 
 const schema = yup.object().shape({
   name: yup.string().required('Name không được để trống !!!'),
@@ -56,21 +51,22 @@ const schema = yup.object().shape({
   }),
 })
 
-const ModalAddEditForum: FC<Props> = ({
+const ModalAddEditForum: FC<Props<IFormDataForum>> = ({
   handleAction,
   handleClose,
-}: // rowSelected,
-Props): JSX.Element => {
+  rowSelected,
+}: Props<IFormDataForum>): JSX.Element => {
   const { isGetAllUserSuccess, messageErrorUser } = useStoreState(userStateSelector)
   const { getAllUser, setIsGetAllUserSuccess } = useStoreActions(userActionSelector)
   const { getAllTopic, setIsGetAllTopicSuccess } = useStoreActions(forumActionSelector)
   const { messageErrorForum, isGetAllTopicSuccess } = useStoreState(forumStateSelector)
   const { setNotifySetting } = useStoreActions(notifyActionSelector)
   const defaultValues: IFormDataForum = {
-    name: '',
-    moderatorId: '',
-    type: '',
-    topicIds: [],
+    id: rowSelected?.id || '',
+    name: rowSelected?.name || '',
+    moderatorId: rowSelected?.moderatorId || '',
+    type: rowSelected?.type || '',
+    topicIds: rowSelected?.topicIds || [],
   }
   const { handleSubmit, control, watch, setValue } = useForm<IFormDataForum>({
     defaultValues: defaultValues,
@@ -86,7 +82,7 @@ Props): JSX.Element => {
       const data = res.map((item: ITopic) => {
         return {
           id: item.id,
-          label: item.name,
+          name: item.name,
         }
       })
       setOptionsTopic(data)
@@ -100,7 +96,7 @@ Props): JSX.Element => {
     if (res) {
       const data = res?.data?.map((item: any) => ({
         id: item.id,
-        label: item.fullName,
+        name: item.fullName,
       }))
       setOptionsModerator(data)
     }
@@ -138,7 +134,9 @@ Props): JSX.Element => {
 
   return (
     <div className='flex flex-col gap-2 relative'>
-      <h2 className='m-auto text-xl font-semibold'>Add Forum</h2>
+      <h2 className='m-auto text-xl font-semibold'>
+        {rowSelected !== undefined ? 'Edit' : 'Add'} forum
+      </h2>
       <span
         className='absolute top-0 right-0 text-xl text-gray-500 cursor-pointer'
         onClick={() => handleClose(false)}>
@@ -198,6 +196,7 @@ Props): JSX.Element => {
                 error={error}
                 options={optionsModerator}
                 placeholder='Select moderator'
+                disabled={rowSelected !== undefined}
               />
             )}
           />
@@ -226,6 +225,7 @@ Props): JSX.Element => {
         )}
 
         <FooterModal
+          isEdit={rowSelected !== undefined}
           handleSubmitAction={onSubmit}
           handleClose={handleClose}
         />

@@ -1,4 +1,4 @@
-import { FC } from 'react'
+import { FC, useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
@@ -9,64 +9,80 @@ import Selected from '@components/Selected'
 import { IOption } from '@interfaces/ITopics'
 import { Gender, ROLE } from '@commom/enum'
 import AutocompleteCustom from '@components/Autocomplete/Autocomplete'
+import { useStoreActions } from 'easy-peasy'
+import { facultyActionSelector } from '@store/index'
+import { IUser } from '@interfaces/IUser'
 
-interface Props {
-  handleAction?: any
-  handleClose?: any
+interface Props<T> {
+  handleAction: (data: any) => Promise<void>
+  handleClose: React.Dispatch<React.SetStateAction<boolean>>
+  rowSelected?: T
 }
 
 const optionsGender: IOption[] = [
   {
     id: Gender.MALE,
-    label: Gender.MALE,
+    name: Gender.MALE,
   },
   {
     id: Gender.FEMALE,
-    label: Gender.FEMALE,
+    name: Gender.FEMALE,
   },
 ]
 
 const optionsRole: IOption[] = [
   {
     id: ROLE.STUDENT,
-    label: ROLE.STUDENT,
+    name: ROLE.STUDENT,
   },
   {
     id: ROLE.TEACHER,
-    label: ROLE.TEACHER,
+    name: ROLE.TEACHER,
   },
 ]
 
-interface IUser {
-  id?: number
-  name: string
-  date_of_birth: string
-  gender: string
-  faculty: string
-  role: string
-  email: string
-  phone_number: string
-}
-
 const schema = yup.object().shape({
-  name: yup.string().required('Name is valid!'),
-  date_of_birth: yup.string().required('Date of birth is valid!'),
+  fullName: yup.string().required('Name is valid!'),
+  dateOfBirth: yup.string().required('Date of birth is valid!'),
   gender: yup.string().required('Gender is valid!'),
-  faculty: yup.string().required('Faculty is valid!'),
-  role: yup.string().required('Role is valid!'),
-  email: yup.string().required('Email is valid!'),
-  phone_number: yup.string().required('Phone number is valid!'),
+  facultyId: yup.string().required('Faculty is valid!'),
+  type: yup.string().required('Role is valid!'),
+  email: yup
+    .string()
+    .matches(
+      /[0-9]{9}@sv1.dut.udn.vn/,
+      'Invalid email format. Please use the format: 123456789@sv1.dut.udn.vn',
+    )
+    .required('Email is required'),
+  phoneNumber: yup.string().required('Phone number is valid!'),
 })
 
-const ModalAddUser: FC<Props> = ({ handleClose, handleAction }: Props): JSX.Element => {
+const ModalAddUser: FC<Props<IUser>> = ({
+  handleClose,
+  handleAction,
+}: Props<IUser>): JSX.Element => {
+  const { getAllFaculty } = useStoreActions(facultyActionSelector)
+  const [optionsFaculty, setOptionFaculty] = useState<IOption[]>([])
+
+  const getAllFacultyAddUser = async (): Promise<void> => {
+    const res = await getAllFaculty()
+    if (res) {
+      setOptionFaculty(res)
+    }
+  }
+
+  useEffect(() => {
+    getAllFacultyAddUser()
+  }, [])
+
   const defaultValues: IUser = {
-    name: '',
-    date_of_birth: '',
+    fullName: '',
+    dateOfBirth: '',
     gender: '',
-    faculty: '',
-    role: '',
+    facultyId: '',
+    type: '',
     email: '',
-    phone_number: '',
+    phoneNumber: '',
   }
   const {
     handleSubmit,
@@ -81,27 +97,12 @@ const ModalAddUser: FC<Props> = ({ handleClose, handleAction }: Props): JSX.Elem
     handleAction(data)
   }
 
-  const optionsFaculty = [
-    {
-      id: 'kakakaka',
-      label: 'Kakakak',
-    },
-    {
-      id: 'akdlaskdlkald',
-      label: 'dábdbasdasd',
-    },
-    {
-      id: 'aaaaa',
-      label: 'aaawwww',
-    },
-  ]
-
   return (
     <div className='flex flex-col gap-2 w-[450px] relative'>
       <h2 className='m-auto text-xl font-semibold'>Add User</h2>
       <span
         className='absolute top-0 right-0 text-xl text-gray-500 cursor-pointer'
-        onClick={() => handleClose()}>
+        onClick={() => handleClose(false)}>
         X
       </span>
 
@@ -121,7 +122,7 @@ const ModalAddUser: FC<Props> = ({ handleClose, handleAction }: Props): JSX.Elem
               Name <span className='text-red-600'>*</span>
             </label>
             <TextFieldV2
-              name='name'
+              name='fullName'
               control={control}
               // placeholder='name'
             />
@@ -135,7 +136,7 @@ const ModalAddUser: FC<Props> = ({ handleClose, handleAction }: Props): JSX.Elem
                 Date of birth <span className='text-red-600'>*</span>
               </label>
               <Controller
-                name='date_of_birth'
+                name='dateOfBirth'
                 control={control}
                 render={({ field: { onChange, value }, fieldState: { error } }) => (
                   <DateTimePicker
@@ -176,7 +177,7 @@ const ModalAddUser: FC<Props> = ({ handleClose, handleAction }: Props): JSX.Elem
                 Faculty <span className='text-red-600'>*</span>
               </label>
               <Controller
-                name='faculty'
+                name='facultyId'
                 control={control}
                 render={({ field: { onChange, value }, fieldState: { error } }) => (
                   <AutocompleteCustom
@@ -196,7 +197,7 @@ const ModalAddUser: FC<Props> = ({ handleClose, handleAction }: Props): JSX.Elem
                 Role <span className='text-red-600'>*</span>
               </label>
               <Controller
-                name='role'
+                name='type'
                 control={control}
                 render={({ field: { onChange, value }, fieldState: { error } }) => (
                   <Selected
@@ -231,7 +232,7 @@ const ModalAddUser: FC<Props> = ({ handleClose, handleAction }: Props): JSX.Elem
               Phone Number <span className='text-red-600'>*</span>
             </label>
             <TextFieldV2
-              name='phone_number'
+              name='phoneNumber'
               control={control}
               // placeholder='name'
             />

@@ -7,6 +7,7 @@ interface IProps {
   placeholder: string
   options: IOption[]
   error: any
+  disabled?: boolean
 }
 
 const AutocompleteCustom: FC<IProps> = ({
@@ -15,14 +16,16 @@ const AutocompleteCustom: FC<IProps> = ({
   placeholder,
   onChange,
   options,
+  disabled,
 }: IProps): JSX.Element => {
-  const defaultOption = { id: '', label: 'None' }
+  const defaultOption = { id: '', name: 'None' }
   const updatedOptions = [defaultOption, ...options]
   return (
     <>
       <Autocomplete
         id='combo-box-demo'
         size='small'
+        disabled={disabled}
         options={updatedOptions}
         onChange={(event, option) => {
           if (option === null) onChange('')
@@ -33,14 +36,14 @@ const AutocompleteCustom: FC<IProps> = ({
           const data = options.find(
             (item: IOption) => option === item.id || option?.id === item.id,
           )
-          return data?.label || ''
+          return data?.name || ''
         }}
         renderOption={(props, option) => {
           return (
             <li
               {...props}
-              key={option?.label}>
-              {option?.label}
+              key={option?.name}>
+              {option?.name}
             </li>
           )
         }}
@@ -57,7 +60,7 @@ const AutocompleteCustom: FC<IProps> = ({
           },
         }}
         isOptionEqualToValue={(option, value) => {
-          return option?.id === value
+          return option.id === value
         }}
         renderInput={(params) => (
           <TextField

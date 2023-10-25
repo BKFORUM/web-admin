@@ -9,21 +9,23 @@ import Button from '@components/Button/Button'
 import SearchInput from '@components/SearchInput'
 import ModalConfirm from '@components/ModalConfirm'
 import ModalAddEdit from '@components/ModalAddEdit'
-import { formatDayVN } from '@utils/functions/formatDay'
 import { useNavigate } from 'react-router-dom'
 import { useStoreActions, useStoreState } from 'easy-peasy'
 import { notifyActionSelector, userActionSelector, userStateSelector } from '@store/index'
-import { IUserView } from '@interfaces/IUser'
+import { IUser } from '@interfaces/IUser'
+import { useDebounce } from '@hooks/useDebounce'
 
 interface Props {}
 
 const UserManagement: FC<Props> = (): JSX.Element => {
   const navigate = useNavigate()
   const { setNotifySetting } = useStoreActions(notifyActionSelector)
-  const { getAllUser, setIsGetAllUserSuccess } = useStoreActions(userActionSelector)
-  const { messageErrorUser, isGetAllUserSuccess } = useStoreState(userStateSelector)
+  const { getAllUser, setIsGetAllUserSuccess, addUser, setIsAddUserSuccess } =
+    useStoreActions(userActionSelector)
+  const { messageErrorUser, isGetAllUserSuccess, isAddUserSuccess } =
+    useStoreState(userStateSelector)
   const [inputSearch, setInputSearch] = useState<string>('')
-  const [rowsData, setRows] = useState<IUserView[]>([])
+  const [rowsData, setRows] = useState<IUser[]>([])
   const [rowTotal, setRowTotal] = useState(0)
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
@@ -53,16 +55,24 @@ const UserManagement: FC<Props> = (): JSX.Element => {
       const data = res?.data?.map((item: any, index: number) => ({
         ...item,
         tag: paginationModel.page * paginationModel.pageSize + index + 1,
-        address: 'chưa có',
       }))
       setRows(data)
     }
     setLoading(false)
   }
+  const debouncedInputValue = useDebounce(inputSearch, 500)
+
+  const addQueryParam = (valueSearch: string): void => {
+    const queryParams = new URLSearchParams()
+    queryParams.set('search', valueSearch.trim())
+    const newURL = `/user-management?${queryParams.toString()}`
+    window.history.pushState({}, '', newURL)
+  }
 
   useEffect(() => {
+    addQueryParam(inputSearch)
     getAllUserPage()
-  }, [sortModel, paginationModel])
+  }, [sortModel, paginationModel, debouncedInputValue])
 
   useEffect(() => {
     if (!isGetAllUserSuccess) {
@@ -70,6 +80,13 @@ const UserManagement: FC<Props> = (): JSX.Element => {
       setIsGetAllUserSuccess(true)
     }
   }, [isGetAllUserSuccess])
+
+  useEffect(() => {
+    if (!isAddUserSuccess) {
+      setNotifySetting({ show: true, status: 'error', message: messageErrorUser })
+      setIsAddUserSuccess(true)
+    }
+  }, [isAddUserSuccess])
 
   const handleSortModelChange = useCallback((newSortModel: GridSortModel) => {
     setSortModel(newSortModel)
@@ -81,7 +98,17 @@ const UserManagement: FC<Props> = (): JSX.Element => {
 
   const handleAction = async (data: any): Promise<void> => {
     console.log(data)
-    console.log(formatDayVN(data?.date_of_birth))
+    const yourTime = new Date(data?.dateOfBirth)
+    const res = await addUser({ ...data, dateOfBirth: yourTime.toISOString() })
+    if (res) {
+      setNotifySetting({
+        show: true,
+        status: 'success',
+        message: 'Add user successful',
+      })
+      setOpenModalEdit(false)
+      getAllUserPage()
+    }
   }
 
   const columnsUser = [
@@ -136,6 +163,7 @@ const UserManagement: FC<Props> = (): JSX.Element => {
       align: 'left',
       headerAlign: 'left',
       hideable: false,
+      sortable: false,
     },
     {
       field: 'address',
@@ -146,9 +174,10 @@ const UserManagement: FC<Props> = (): JSX.Element => {
       align: 'left',
       headerAlign: 'left',
       disableColumnMenu: true,
+      sortable: false,
       hideable: false,
       renderCell: (params: GridRenderCellParams<any, string>) => (
-        <Tooltip title={params.row.address}>
+        <Tooltip title={params.row.address !== null ? params.row.address : ''}>
           <p className={`text-black line-clamp-1`}>{params.row.address}</p>
         </Tooltip>
       ),
@@ -156,6 +185,7 @@ const UserManagement: FC<Props> = (): JSX.Element => {
     {
       field: 'type',
       headerName: 'Role',
+      sortable: false,
       type: 'string',
       minWidth: 140,
       flex: 1,

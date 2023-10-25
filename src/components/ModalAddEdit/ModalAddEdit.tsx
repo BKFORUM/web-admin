@@ -3,17 +3,14 @@ import { FC } from 'react'
 import ModalAddEditForum from './ModalAddEditForum'
 import ModalAddUserForum from './ModalAddUserForum'
 import ModalAddUser from './ModalAddUser'
-interface Props {
+interface Props<T> {
   open: boolean
   handleClose: React.Dispatch<React.SetStateAction<boolean>>
   handleAction: (data: any) => Promise<void>
   data?: any
   setData?: any
   page?: any
-  duplicate?: any
-  setDuplicate?: any
-  noDuplicate?: any
-  rowSelected?: any
+  rowSelected?: T
 }
 
 const style = {
@@ -29,7 +26,7 @@ const style = {
   p: 2.5,
 }
 
-const ModalAddEdit: FC<Props> = ({
+const ModalAddEdit: FC<Props<any>> = ({
   open,
   handleClose,
   handleAction,

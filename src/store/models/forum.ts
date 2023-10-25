@@ -1,6 +1,6 @@
 import { persist, action, Action, Thunk, thunk } from "easy-peasy";
-import { addForum, addUserToForum, getAllForum, getAllTopic } from "../../services/forum.service";
-import { IListUserRequest } from "@interfaces/IForum";
+import { addForum, addUserToForum, deleteForum, editForum, getAllForum, getAllTopic } from "../../services/forum.service";
+import { IFormDataForum, IListUserRequest } from "@interfaces/IForum";
 
 export interface IForumModel {
     //MessageError
@@ -15,7 +15,17 @@ export interface IForumModel {
     //AddForum
     isAddForumSuccess: boolean;
     setIsAddForumSuccess: Action<IForumModel, boolean>
-    addForum: Thunk<IForumModel, any>;
+    addForum: Thunk<IForumModel, IFormDataForum>;
+
+    //EditForum
+    isEditForumSuccess: boolean;
+    setIsEditForumSuccess: Action<IForumModel, boolean>
+    editForum: Thunk<IForumModel, IFormDataForum>;
+
+    //DeleteForum
+    isDeleteForumSuccess: boolean;
+    setIsDeleteForumSuccess: Action<IForumModel, boolean>
+    deleteForum: Thunk<IForumModel, string>;
 
     //AddUserToForum
     isAddUserToForumSuccess: boolean;
@@ -66,6 +76,42 @@ export const forumModel: IForumModel = persist({
             })
             .catch((error) => {
                 actions.setIsAddForumSuccess(false)
+                actions.setMessageErrorForum(error?.response?.data?.message)
+            });
+    }),
+
+    //EditForum
+    isEditForumSuccess: true,
+    setIsEditForumSuccess: action((state, payload) => {
+        state.isEditForumSuccess = payload;
+    }),
+
+    editForum: thunk(async (actions, payload) => {
+        return editForum(payload)
+            .then(async (res) => {
+                actions.setIsEditForumSuccess(true)
+                return res;
+            })
+            .catch((error) => {
+                actions.setIsEditForumSuccess(false)
+                actions.setMessageErrorForum(error?.response?.data?.message)
+            });
+    }),
+
+    //DeleteForum
+    isDeleteForumSuccess: true,
+    setIsDeleteForumSuccess: action((state, payload) => {
+        state.isDeleteForumSuccess = payload;
+    }),
+
+    deleteForum: thunk(async (actions, payload) => {
+        return deleteForum(payload)
+            .then(async (res) => {
+                actions.setIsEditForumSuccess(true)
+                return res;
+            })
+            .catch((error) => {
+                actions.setIsEditForumSuccess(false)
                 actions.setMessageErrorForum(error?.response?.data?.message)
             });
     }),

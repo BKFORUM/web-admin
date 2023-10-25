@@ -51,7 +51,7 @@ export default function MultiSelect({
               {selected.map((item: any) => (
                 <Chip
                   key={item}
-                  label={options.find((option) => option.id === item)?.label}
+                  label={options.find((option) => option.id === item)?.name}
                 />
               ))}
             </Box>
@@ -60,7 +60,7 @@ export default function MultiSelect({
             <MenuItem
               key={option.id}
               value={option.id}>
-              {option.label}
+              {option.name}
             </MenuItem>
           ))}
         </Select>

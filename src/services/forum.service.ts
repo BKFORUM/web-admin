@@ -1,4 +1,4 @@
-import { IListUserRequest } from "@interfaces/IForum";
+import { IFormDataForum, IListUserRequest } from "@interfaces/IForum";
 import BaseURL from "@utils/api/baseURL";
 
 const getAllForum = (params: any) => {
@@ -16,11 +16,27 @@ const getAllTopic = () => {
     });
 }
 
-const addForum = (data: any) => {
+const addForum = (data: Omit<IFormDataForum, 'id'>) => {
     return BaseURL({
         url: `/forums`,
         method: "POST",
         data,
+    });
+}
+
+const editForum = (data: IFormDataForum) => {
+    return BaseURL({
+        url: `/forums/` + data.id,
+        method: "PUT",
+        // data: { ...data, status: "PENDING" },
+        data,
+    });
+}
+
+const deleteForum = (id: string) => {
+    return BaseURL({
+        url: `/forums/` + id,
+        method: "DELETE",
     });
 }
 
@@ -32,4 +48,4 @@ const addUserToForum = (data: IListUserRequest) => {
     });
 }
 
-export { getAllForum, addForum, addUserToForum, getAllTopic }
+export { getAllForum, addForum, addUserToForum, getAllTopic, editForum, deleteForum }

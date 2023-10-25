@@ -1,8 +1,20 @@
+
 export interface IUserLogin {
     email: string;
     password: string;
 }
 
+export interface IModerator {
+    id: string
+    fullName: string,
+    gender: string,
+    dateOfBirth: string
+    avatarUrl: string,
+    faculty: {
+        id: string,
+        name: string
+    }
+}
 export interface IUserForum {
     id: number
     fullName: string
@@ -11,14 +23,18 @@ export interface IUserForum {
     dateOfBirth: string
 }
 
-export interface IUserView {
-    id: number
+export interface IUser {
+    id?: number
     fullName: string
     email: string
     gender: string
-    address: string
+    address?: string
     type: string
+    facultyId: string
+    phoneNumber: string
+    dateOfBirth: string
 }
+
 
 
 

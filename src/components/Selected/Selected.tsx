@@ -50,7 +50,7 @@ const Selected: FC<Props> = ({
           <MenuItem
             key={option.id}
             value={option.id}>
-            {option.label}
+            {option.name}
           </MenuItem>
         ))}
       </Select>

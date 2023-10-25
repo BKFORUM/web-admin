@@ -6,7 +6,7 @@ import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import { FC, useCallback, useEffect, useState } from 'react'
-import { GridRenderCellParams, GridSortDirection, GridSortModel } from '@mui/x-data-grid'
+import { GridRenderCellParams, GridSortModel } from '@mui/x-data-grid'
 import ModalConfirm from '@components/ModalConfirm'
 import ModalAddEdit from '@components/ModalAddEdit'
 import { useNavigate } from 'react-router-dom'
@@ -27,10 +27,23 @@ const ForumTab: FC<Props> = (): JSX.Element => {
   const searchParams = new URLSearchParams(window.location.search)
   const search = searchParams.get('search')
 
-  const { getAllForum, addForum, setIsGetAllForumSuccess, setIsAddForumSuccess } =
-    useStoreActions(forumActionSelector)
-  const { messageErrorForum, isGetAllForumSuccess, isAddForumSuccess } =
-    useStoreState(forumStateSelector)
+  const {
+    getAllForum,
+    addForum,
+    setIsGetAllForumSuccess,
+    setIsAddForumSuccess,
+    editForum,
+    setIsEditForumSuccess,
+    deleteForum,
+    setIsDeleteForumSuccess,
+  } = useStoreActions(forumActionSelector)
+  const {
+    messageErrorForum,
+    isGetAllForumSuccess,
+    isAddForumSuccess,
+    isEditForumSuccess,
+    isDeleteForumSuccess,
+  } = useStoreState(forumStateSelector)
   const { setNotifySetting } = useStoreActions(notifyActionSelector)
 
   const [inputSearch, setInputSearch] = useState<string>(search !== null ? search : '')
@@ -50,7 +63,7 @@ const ForumTab: FC<Props> = (): JSX.Element => {
   const [openModalDelete, setOpenModalDelete] = useState(false)
   const [openModalEdit, setOpenModalEdit] = useState(false)
   const [loading, setLoading] = useState<boolean>(false)
-  const [rowSelected, setRowSelected] = useState<string | null>(null)
+  const [rowSelected, setRowSelected] = useState<IForumTab | undefined>(undefined)
 
   const debouncedInputValue = useDebounce(inputSearch, 500)
 
@@ -74,7 +87,6 @@ const ForumTab: FC<Props> = (): JSX.Element => {
       const data = res?.data?.map((item: any, index: number) => ({
         ...item,
         tag: paginationModel.page * paginationModel.pageSize + index + 1,
-        moderator: item?.moderator?.fullName,
         total_members: 40,
         event: 40,
       }))
@@ -98,6 +110,20 @@ const ForumTab: FC<Props> = (): JSX.Element => {
   }, [isAddForumSuccess])
 
   useEffect(() => {
+    if (!isEditForumSuccess) {
+      setNotifySetting({ show: true, status: 'error', message: messageErrorForum })
+      setIsEditForumSuccess(true)
+    }
+  }, [isEditForumSuccess])
+
+  useEffect(() => {
+    if (!isDeleteForumSuccess) {
+      setNotifySetting({ show: true, status: 'error', message: messageErrorForum })
+      setIsDeleteForumSuccess(true)
+    }
+  }, [isDeleteForumSuccess])
+
+  useEffect(() => {
     addQueryParam(inputSearch)
     getAllForumTab()
   }, [sortModel, paginationModel, debouncedInputValue])
@@ -110,15 +136,40 @@ const ForumTab: FC<Props> = (): JSX.Element => {
     setInputSearch(value)
   }
 
-  const handleDeleteOrder = async () => {
+  const handleDelete = async () => {
+    const res = await deleteForum(String(rowSelected?.id))
+    if (res) {
+      setNotifySetting({
+        show: true,
+        status: 'success',
+        message: 'Delete forum successful',
+      })
+      getAllForumTab()
+    }
     setOpenModalDelete(false)
   }
 
   const handleAction = async (data: any): Promise<void> => {
-    const res = await addForum(data)
-    if (res) {
-      setNotifySetting({ show: true, status: 'success', message: 'Add forum successful' })
-      getAllForumTab()
+    if (rowSelected !== undefined) {
+      const res = await editForum(data)
+      if (res) {
+        setNotifySetting({
+          show: true,
+          status: 'success',
+          message: 'Edit forum successful',
+        })
+        getAllForumTab()
+      }
+    } else {
+      const res = await addForum(data)
+      if (res) {
+        setNotifySetting({
+          show: true,
+          status: 'success',
+          message: 'Add forum successful',
+        })
+        getAllForumTab()
+      }
     }
   }
 
@@ -161,8 +212,8 @@ const ForumTab: FC<Props> = (): JSX.Element => {
       headerAlign: 'left',
       hideable: false,
       renderCell: (params: GridRenderCellParams<any, string>) => (
-        <Tooltip title={params.row.moderator}>
-          <p className={`text-black line-clamp-1`}>{params.row.moderator}</p>
+        <Tooltip title={params.row.moderator.fullName}>
+          <p className={`text-black line-clamp-1`}>{params.row.moderator.fullName}</p>
         </Tooltip>
       ),
     },
@@ -220,14 +271,17 @@ const ForumTab: FC<Props> = (): JSX.Element => {
           <EditIcon
             sx={{ cursor: 'pointer' }}
             onClick={() => {
-              setRowSelected(params.params.row.id)
+              setRowSelected({
+                ...params.params.row,
+                moderatorId: params.params.row.moderator.id,
+              })
               setOpenModalEdit(true)
             }}
           />
           <DeleteIcon
             sx={{ color: '#d32f2f', cursor: 'pointer' }}
             onClick={() => {
-              setRowSelected(params.params.row.id)
+              setRowSelected(params.params.row)
               setOpenModalDelete(true)
             }}
           />
@@ -247,7 +301,7 @@ const ForumTab: FC<Props> = (): JSX.Element => {
           <Button
             typeButton='blue'
             onClick={() => {
-              setRowSelected(null)
+              setRowSelected(undefined)
               setOpenModalEdit(true)
             }}>
             <div className='flex items-center gap-2'>
@@ -276,7 +330,7 @@ const ForumTab: FC<Props> = (): JSX.Element => {
           handleClose={() => {
             setOpenModalDelete(false)
           }}
-          handleDelete={handleDeleteOrder}
+          handleDelete={handleDelete}
         />
       ) : null}
       {openModalEdit ? (
