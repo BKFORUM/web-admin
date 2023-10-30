@@ -1,6 +1,6 @@
 export interface ITopic {
     id: string;
-    name: string;
+    name?: string;
     displayName: string;
 }
 

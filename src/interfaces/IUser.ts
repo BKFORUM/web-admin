@@ -16,15 +16,18 @@ export interface IModerator {
     }
 }
 export interface IUserForum {
-    id: number
+    id: string
     fullName: string
     email: string
-    phone_number: string
+    phoneNumber: string
+    address: string
     dateOfBirth: string
+    gender: string
+    avatarUrl: string
 }
 
 export interface IUser {
-    id?: number
+    id?: string
     fullName: string
     email: string
     gender: string
@@ -33,6 +36,13 @@ export interface IUser {
     facultyId: string
     phoneNumber: string
     dateOfBirth: string
+}
+
+export interface IUserDetail extends IUser {
+    faculty?: {
+        name: string
+    }
+    avatarUrl?: string
 }
 
 

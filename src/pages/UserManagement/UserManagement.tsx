@@ -40,7 +40,7 @@ const UserManagement: FC<Props> = (): JSX.Element => {
   const [loading, setLoading] = useState<boolean>(false)
   const [openModalDelete, setOpenModalDelete] = useState(false)
   const [openModalEdit, setOpenModalEdit] = useState(false)
-  const [rowSelected, setRowSelected] = useState<number | null>(null)
+  const [rowSelected, setRowSelected] = useState<IUser | undefined>(undefined)
 
   const getAllUserPage = async (): Promise<void> => {
     setLoading(true)
@@ -250,6 +250,7 @@ const UserManagement: FC<Props> = (): JSX.Element => {
             typeButton='blue'
             onClick={() => {
               setOpenModalEdit(true)
+              setRowSelected(undefined)
             }}>
             <div className='flex items-center gap-2'>
               <AddIcon />

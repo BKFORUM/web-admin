@@ -1,5 +1,6 @@
 import { persist, action, Action, Thunk, thunk } from "easy-peasy";
-import { addUser, getAllUser } from "../../services/user.service";
+import { addUser, editUser, getAllUser, getUserById } from "../../services/user.service";
+import { IUser } from "@interfaces/IUser";
 
 export interface IUserModel {
     //MessageError
@@ -11,10 +12,20 @@ export interface IUserModel {
     setIsGetAllUserSuccess: Action<IUserModel, boolean>;
     getAllUser: Thunk<IUserModel, any>;
 
+    //GetUserById
+    isGetUserByIdSuccess: boolean;
+    setIsGetUserByIdSuccess: Action<IUserModel, boolean>;
+    getUserById: Thunk<IUserModel, string>;
+
     //addUser
     isAddUserSuccess: boolean;
     setIsAddUserSuccess: Action<IUserModel, boolean>;
-    addUser: Thunk<IUserModel, any>;
+    addUser: Thunk<IUserModel, Omit<IUser, any>>;
+
+    //editUser
+    isEditUserSuccess: boolean;
+    setIsEditUserSuccess: Action<IUserModel, boolean>;
+    editEdit: Thunk<IUserModel, IUser>;
 }
 
 export const userModel: IUserModel = persist({
@@ -41,6 +52,23 @@ export const userModel: IUserModel = persist({
             });
     }),
 
+    //getUserById
+    isGetUserByIdSuccess: true,
+    setIsGetUserByIdSuccess: action((state, payload) => {
+        state.isGetUserByIdSuccess = payload;
+    }),
+    getUserById: thunk(async (actions, payload) => {
+        return getUserById(payload)
+            .then(async (res) => {
+                actions.setIsGetAllUserSuccess(true)
+                return res.data;
+            })
+            .catch((error) => {
+                actions.setIsGetAllUserSuccess(false)
+                actions.setMessageErrorUser(error?.response?.data?.message)
+            });
+    }),
+
     //addUser
     isAddUserSuccess: true,
     setIsAddUserSuccess: action((state, payload) => {
@@ -54,6 +82,23 @@ export const userModel: IUserModel = persist({
             })
             .catch((error) => {
                 actions.setIsGetAllUserSuccess(false)
+                actions.setMessageErrorUser(error?.response?.data?.message)
+            });
+    }),
+
+    //editUser
+    isEditUserSuccess: true,
+    setIsEditUserSuccess: action((state, payload) => {
+        state.isEditUserSuccess = payload;
+    }),
+    editEdit: thunk(async (actions, payload) => {
+        return editUser(payload)
+            .then(async (res) => {
+                actions.setIsEditUserSuccess(true)
+                return res;
+            })
+            .catch((error) => {
+                actions.setIsEditUserSuccess(false)
                 actions.setMessageErrorUser(error?.response?.data?.message)
             });
     }),

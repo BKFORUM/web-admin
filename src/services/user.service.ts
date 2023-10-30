@@ -9,6 +9,13 @@ const getAllUser = (params: any) => {
     });
 }
 
+const getUserById = (id: string) => {
+    return BaseURL({
+        url: `/users/` + id,
+        method: "GET",
+    });
+}
+
 const addUser = (data: Omit<IUser, 'id'>) => {
     return BaseURL({
         url: `/users`,
@@ -17,4 +24,12 @@ const addUser = (data: Omit<IUser, 'id'>) => {
     });
 }
 
-export { getAllUser, addUser }
+const editUser = (data: IUser) => {
+    return BaseURL({
+        url: `/users/` + data.id,
+        method: "PUT",
+        data,
+    });
+}
+
+export { getAllUser, addUser, getUserById, editUser }

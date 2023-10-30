@@ -1,11 +1,15 @@
-import { IModerator } from "./IUser"
+import { IPostForum } from "./IPost"
+import { ITopic } from "./ITopics"
+import { IModerator, IUserForum } from "./IUser"
 
 export interface IForumTab {
     id: string
     name: string
     moderator: IModerator
-    total_members: number
+    topicIds: string[]
+    type: string
     event: number
+    total_members: number
 }
 
 export interface IFormDataForum {
@@ -19,8 +23,8 @@ export interface IFormDataForum {
 export interface IRequestForum {
     id: string
     name: string
-    moderator: string
-    topics: string[]
+    moderator: IModerator
+    topics: ITopic[]
     createAt: string
 }
 
@@ -29,10 +33,27 @@ export interface IListUserRequest {
     userIds: string[]
 }
 
+export interface IRequestForumData {
+    id?: string
+    status?: string
+}
+
 export interface IViewUserAddList {
     id: string
     fullName: string
     checked: boolean
     avatarUrl: string
     email: string
+}
+
+export interface IForumDetail {
+    name: string
+    moderator: IUserForum
+    topics?: [{
+        topic: ITopic
+    }]
+    posts: IPostForum[]
+    users: [{
+        user: IUserForum
+    }]
 }

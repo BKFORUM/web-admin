@@ -15,10 +15,34 @@ import {
   forumStateSelector,
   notifyActionSelector,
 } from '@store/index'
+import { ITopic } from '@interfaces/ITopics'
+import { formatDateLocalV2 } from '@utils/functions/formatDay'
 interface Props {}
 
-function ActionsMenu({ params }: any) {
+interface IActionMenu {
+  params: any
+  isUpdate: React.Dispatch<React.SetStateAction<boolean>>
+}
+
+function ActionsMenu({ params, isUpdate }: IActionMenu) {
+  const { setNotifySetting } = useStoreActions(notifyActionSelector)
   const [anchorEl, setAnchorEl] = useState(null)
+  const [loading, setLoading] = useState<boolean>(false)
+  const { updateStatusForum, setIsUpdateStatusForum } =
+    useStoreActions(forumActionSelector)
+  const { messageErrorForum, isUpdateStatusForumSuccess } =
+    useStoreState(forumStateSelector)
+
+  useEffect(() => {
+    if (!isUpdateStatusForumSuccess) {
+      setNotifySetting({
+        show: true,
+        status: 'error',
+        message: messageErrorForum,
+      })
+      setIsUpdateStatusForum(true)
+    }
+  }, [isUpdateStatusForumSuccess])
 
   const handleClick = (event: any) => {
     setAnchorEl(event.currentTarget)
@@ -28,13 +52,40 @@ function ActionsMenu({ params }: any) {
     setAnchorEl(null)
   }
 
-  const handleAddClick = () => {
-    console.log(`Add clicked for item with ID ${params.row.id}`)
+  const handleApproveClick = async () => {
+    setLoading(true)
+    const res = await updateStatusForum({ id: params.row.id, status: 'ACTIVE' })
+    if (res) {
+      setNotifySetting({
+        show: true,
+        status: 'success',
+        message: 'Approve forum successful',
+      })
+      isUpdate(false)
+      setLoading(false)
+    } else {
+      isUpdate(true)
+      setLoading(false)
+    }
+
     handleClose()
   }
 
-  const handleEditClick = () => {
-    console.log(`Edit clicked for item with ID ${params.row.id}`)
+  const handleRejectClick = async () => {
+    setLoading(true)
+    const res = await updateStatusForum({ id: params.row.id, status: 'DELETED' })
+    if (res) {
+      setNotifySetting({
+        show: true,
+        status: 'success',
+        message: 'Reject forum successful',
+      })
+      isUpdate(false)
+      setLoading(false)
+    } else {
+      isUpdate(true)
+      setLoading(false)
+    }
     handleClose()
   }
 
@@ -42,8 +93,16 @@ function ActionsMenu({ params }: any) {
     <>
       <>
         <div className={`lg:flex gap-2 xs:hidden`}>
-          <Button typeButton='approve'>Approve</Button>
-          <Button typeButton='reject'>Reject</Button>
+          <Button
+            loading={loading}
+            typeButton='approve'>
+            Approve
+          </Button>
+          <Button
+            loading={loading}
+            typeButton='reject'>
+            Reject
+          </Button>
         </div>
       </>
       <div className='xs:block lg:hidden'>
@@ -60,11 +119,15 @@ function ActionsMenu({ params }: any) {
           keepMounted
           open={Boolean(anchorEl)}
           onClose={handleClose}>
-          <MenuItem onClick={handleAddClick}>
+          <MenuItem
+            disabled={loading}
+            onClick={handleApproveClick}>
             <DoneIcon className='text-green-600' />
             <span className='ml-2 text-green-600'> Approve</span>
           </MenuItem>
-          <MenuItem onClick={handleEditClick}>
+          <MenuItem
+            disabled={loading}
+            onClick={handleRejectClick}>
             <ClearIcon className='text-red-600' />
             <span className='ml-2 text-red-600'> Reject</span>
           </MenuItem>
@@ -92,6 +155,7 @@ const RequestForum: FC<Props> = (): JSX.Element => {
     },
   ])
   const [loading, setLoading] = useState<boolean>(false)
+  const [isUpdate, setIsUpdate] = useState<boolean>(true)
 
   const getAllRequestForum = async (): Promise<void> => {
     setLoading(true)
@@ -108,7 +172,6 @@ const RequestForum: FC<Props> = (): JSX.Element => {
       const data = res?.data?.map((item: any, index: number) => ({
         ...item,
         tag: paginationModel.page * paginationModel.pageSize + index + 1,
-        moderator: item?.moderator?.fullName,
       }))
       setRows(data)
       setLoading(false)
@@ -120,6 +183,12 @@ const RequestForum: FC<Props> = (): JSX.Element => {
   useEffect(() => {
     getAllRequestForum()
   }, [sortModel, paginationModel])
+
+  useEffect(() => {
+    if (!isUpdate) {
+      getAllRequestForum()
+    }
+  }, [isUpdate])
 
   useEffect(() => {
     if (!isGetAllForumSuccess) {
@@ -175,8 +244,8 @@ const RequestForum: FC<Props> = (): JSX.Element => {
       headerAlign: 'left',
       hideable: false,
       renderCell: (params: GridRenderCellParams<any, string>) => (
-        <Tooltip title={params.row.moderator}>
-          <p className={`text-black line-clamp-1`}>{params.row.moderator}</p>
+        <Tooltip title={params.row.moderator.fullName}>
+          <p className={`text-black line-clamp-1`}>{params.row.moderator.fullName}</p>
         </Tooltip>
       ),
     },
@@ -191,25 +260,29 @@ const RequestForum: FC<Props> = (): JSX.Element => {
       renderCell: (params: GridRenderCellParams<any, string>) =>
         params.row.topics.length > 2 ? (
           <div className='flex'>
-            {params.row.topics.slice(0, 2).map((item: string, index: number) => (
+            {params.row.topics.slice(0, 2).map((item: ITopic, index: number) => (
               <p
                 key={index}
                 className='text-black bg-slate-200 px-3 py-1 rounded-2xl mr-2 line-clamp-1'>
-                {item}
+                {item.name}
               </p>
             ))}
-            <Tooltip title={params.row.topics.slice(2).join(', ')}>
+            <Tooltip
+              title={params.row.topics
+                .slice(2)
+                .map((item: ITopic) => item.name)
+                .join(', ')}>
               <p className='text-black bg-slate-200 px-3 py-1 rounded-2xl mr-2 line-clamp-1'>
                 + {params.row.topics.length - 2}
               </p>
             </Tooltip>
           </div>
         ) : (
-          params.row.topics.map((item: string, index: number) => (
+          params.row.topics.map((item: ITopic, index: number) => (
             <p
               key={index}
               className='text-black bg-slate-200 px-3 py-1 rounded-2xl mr-2 line-clamp-1'>
-              {item}
+              {item.name}
             </p>
           ))
         ),
@@ -224,6 +297,13 @@ const RequestForum: FC<Props> = (): JSX.Element => {
       headerAlign: 'left',
       disableColumnMenu: true,
       hideable: false,
+      renderCell: (params: GridRenderCellParams<any, string>) => (
+        <Tooltip title={formatDateLocalV2(params.row.createAt)}>
+          <p className={`text-black line-clamp-1`}>
+            {formatDateLocalV2(params.row.createAt)}
+          </p>
+        </Tooltip>
+      ),
     },
     {
       field: 'status',
@@ -236,7 +316,10 @@ const RequestForum: FC<Props> = (): JSX.Element => {
       sortable: false,
       disableSelectionOnClick: false,
       renderCell: (params: GridRenderCellParams<any, any>) => (
-        <ActionsMenu params={params} />
+        <ActionsMenu
+          params={params}
+          isUpdate={setIsUpdate}
+        />
       ),
     },
   ]

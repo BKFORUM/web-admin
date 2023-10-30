@@ -60,6 +60,7 @@ const schema = yup.object().shape({
 const ModalAddUser: FC<Props<IUser>> = ({
   handleClose,
   handleAction,
+  rowSelected,
 }: Props<IUser>): JSX.Element => {
   const { getAllFaculty } = useStoreActions(facultyActionSelector)
   const [optionsFaculty, setOptionFaculty] = useState<IOption[]>([])
@@ -76,13 +77,15 @@ const ModalAddUser: FC<Props<IUser>> = ({
   }, [])
 
   const defaultValues: IUser = {
-    fullName: '',
-    dateOfBirth: '',
-    gender: '',
-    facultyId: '',
-    type: '',
-    email: '',
-    phoneNumber: '',
+    id: rowSelected?.id || '',
+    fullName: rowSelected?.fullName || '',
+    dateOfBirth: rowSelected?.dateOfBirth || '',
+    gender: rowSelected?.gender || '',
+    facultyId: rowSelected?.facultyId || '',
+    type: rowSelected?.type || '',
+    email: rowSelected?.email || '',
+    phoneNumber: rowSelected?.phoneNumber || '',
+    address: rowSelected?.address || '',
   }
   const {
     handleSubmit,
@@ -99,7 +102,9 @@ const ModalAddUser: FC<Props<IUser>> = ({
 
   return (
     <div className='flex flex-col gap-2 w-[450px] relative'>
-      <h2 className='m-auto text-xl font-semibold'>Add User</h2>
+      <h2 className='m-auto text-xl font-semibold'>
+        {rowSelected !== undefined ? 'Edit' : 'Add'} user
+      </h2>
       <span
         className='absolute top-0 right-0 text-xl text-gray-500 cursor-pointer'
         onClick={() => handleClose(false)}>
@@ -221,6 +226,7 @@ const ModalAddUser: FC<Props<IUser>> = ({
             <TextFieldV2
               name='email'
               control={control}
+              disabled={rowSelected !== undefined ? true : false}
               // placeholder='name'
             />
           </div>
@@ -238,7 +244,21 @@ const ModalAddUser: FC<Props<IUser>> = ({
             />
           </div>
 
+          <div className='flex flex-col gap-1'>
+            <label
+              htmlFor=''
+              className='font-semibold text-gray-700'>
+              Address
+            </label>
+            <TextFieldV2
+              name='address'
+              control={control}
+              // placeholder='name'
+            />
+          </div>
+
           <FooterModal
+            isEdit={rowSelected !== undefined}
             handleSubmitAction={onSubmit}
             handleClose={handleClose}
           />

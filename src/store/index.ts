@@ -10,6 +10,7 @@ import { notifyModel as notify, INotifyModel } from "./models/notify";
 import { forumModel as forum, IForumModel } from "./models/forum";
 import { userModel as user, IUserModel } from "./models/user";
 import { facultyModel as faculty, IFacultyModel } from "./models/faculty";
+import { postModel as post, IPostModel } from "./models/post";
 
 
 export interface IStoreModel {
@@ -18,6 +19,7 @@ export interface IStoreModel {
     forum: IForumModel;
     user: IUserModel
     faculty: IFacultyModel
+    post: IPostModel
 }
 
 const storeModel: IStoreModel = {
@@ -25,7 +27,8 @@ const storeModel: IStoreModel = {
     notify,
     forum,
     user,
-    faculty
+    faculty,
+    post
 }
 
 export const { useStoreActions, useStoreState, useStoreDispatch, useStore } =
@@ -54,6 +57,9 @@ export const userActionSelector = (state: IActionMapper) => state.user;
 export const facultyStateSelector = (state: IStateMapper) => state.faculty;
 export const facultyActionSelector = (state: IActionMapper) => state.faculty;
 
+//Post
+export const postStateSelector = (state: IStateMapper) => state.post;
+export const postActionSelector = (state: IActionMapper) => state.post;
 
 const store = createStore(storeModel, {
     name: "store",

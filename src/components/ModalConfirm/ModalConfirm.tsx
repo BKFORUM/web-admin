@@ -19,20 +19,12 @@ const style = {
 }
 
 interface IProps {
-  open?: any
-  handleClose?: any
-  handleDelete?: any
-  data?: any
-  page?: any
+  open: boolean
+  handleClose: React.Dispatch<React.SetStateAction<boolean>>
+  handleDelete: () => Promise<void>
 }
 
-export default function ModalConfirm({
-  open,
-  handleClose,
-  handleDelete,
-  data,
-  page,
-}: IProps) {
+export default function ModalConfirm({ open, handleClose, handleDelete }: IProps) {
   return (
     <div>
       <Modal
@@ -46,7 +38,7 @@ export default function ModalConfirm({
           <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
             <ClearIcon
               sx={{ cursor: 'pointer' }}
-              onClick={handleClose}
+              onClick={() => handleClose(false)}
             />
           </Box>
 
@@ -92,7 +84,7 @@ export default function ModalConfirm({
                   },
                 }}
                 variant='outlined'
-                onClick={handleClose}>
+                onClick={() => handleClose(false)}>
                 NO
               </Button>
             </Box>

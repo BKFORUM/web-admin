@@ -19,6 +19,7 @@ import {
 } from '@store/index'
 import { IForumTab } from '@interfaces/IForum'
 import { useDebounce } from '@hooks/useDebounce'
+import { ITopic } from '@interfaces/ITopics'
 
 interface Props {}
 
@@ -87,6 +88,7 @@ const ForumTab: FC<Props> = (): JSX.Element => {
       const data = res?.data?.map((item: any, index: number) => ({
         ...item,
         tag: paginationModel.page * paginationModel.pageSize + index + 1,
+        topicIds: item?.topics.map((topic: ITopic) => topic.id),
         total_members: 40,
         event: 40,
       }))

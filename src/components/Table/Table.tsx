@@ -5,13 +5,12 @@ interface IProps {
   columns?: any
   rows?: any
   loading?: boolean
-  sortable?: any
   totalRow?: number
-  sortModel?: any
-  paginationModel?: any
+  sortModel?: GridSortModel
   onSortModelChange?: (sortModel: GridSortModel) => void
+  paginationModel?: any
   onPaginationModelChange?: any
-  hiddenFooter?: any
+  hiddenFooter?: boolean
 }
 
 const Table = ({
@@ -47,8 +46,8 @@ const Table = ({
             display: `${hiddenFooter ? 'none' : ''}`,
           },
           '& .MuiDataGrid-virtualScroller': {
-            height: `${hiddenFooter && rows.length > 4 ? '280px' : 'h-auto'}`,
-            overflow: `${hiddenFooter && rows.length > 4 ? 'auto !important' : ''}`,
+            height: `${hiddenFooter && rows.length > 7 ? '280px' : 'h-auto'}`,
+            overflow: `${hiddenFooter && rows.length > 7 ? 'auto !important' : ''}`,
             scrollbarGutter: 'stable',
           },
         }}
@@ -56,7 +55,7 @@ const Table = ({
         columns={columns}
         rowCount={totalRow}
         loading={loading}
-        sortingMode='server'
+        sortingMode={!hiddenFooter ? 'server' : 'client'}
         sortModel={sortModel}
         sortingOrder={['asc', 'desc']}
         onSortModelChange={onSortModelChange}
@@ -65,7 +64,7 @@ const Table = ({
         getRowHeight={() => 'auto'}
         autoHeight
         pageSizeOptions={[10]}
-        paginationMode='server'
+        paginationMode={!hiddenFooter ? 'server' : 'client'}
         paginationModel={paginationModel}
         onPaginationModelChange={onPaginationModelChange}
       />

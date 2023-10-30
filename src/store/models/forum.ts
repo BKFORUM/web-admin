@@ -1,6 +1,6 @@
 import { persist, action, Action, Thunk, thunk } from "easy-peasy";
-import { addForum, addUserToForum, deleteForum, editForum, getAllForum, getAllTopic } from "../../services/forum.service";
-import { IFormDataForum, IListUserRequest } from "@interfaces/IForum";
+import { addForum, addUserToForum, deleteForum, editForum, getAllForum, getAllTopic, getForumById, updateStatusForum } from "../../services/forum.service";
+import { IFormDataForum, IListUserRequest, IRequestForumData } from "@interfaces/IForum";
 
 export interface IForumModel {
     //MessageError
@@ -11,6 +11,11 @@ export interface IForumModel {
     isGetAllForumSuccess: boolean;
     setIsGetAllForumSuccess: Action<IForumModel, boolean>
     getAllForum: Thunk<IForumModel, any>;
+
+    //GetForumById
+    isGetForumByIdSuccess: boolean;
+    setIsGetForumByIdSuccess: Action<IForumModel, boolean>
+    getForumById: Thunk<IForumModel, any>;
 
     //AddForum
     isAddForumSuccess: boolean;
@@ -31,6 +36,11 @@ export interface IForumModel {
     isAddUserToForumSuccess: boolean;
     setIsAddUserToForumSuccess: Action<IForumModel, boolean>
     addUserToForum: Thunk<IForumModel, IListUserRequest>;
+
+    //updateStatusForum
+    isUpdateStatusForumSuccess: boolean;
+    setIsUpdateStatusForum: Action<IForumModel, boolean>
+    updateStatusForum: Thunk<IForumModel, IRequestForumData>;
 
     //GetALLTopic
     isGetAllTopicSuccess: boolean
@@ -59,6 +69,22 @@ export const forumModel: IForumModel = persist({
             })
             .catch((error) => {
                 actions.setIsGetAllForumSuccess(false)
+                actions.setMessageErrorForum(error?.response?.data?.message)
+            });
+    }),
+
+    isGetForumByIdSuccess: true,
+    setIsGetForumByIdSuccess: action((state, payload) => {
+        state.isGetForumByIdSuccess = payload;
+    }),
+    getForumById: thunk(async (actions, payload) => {
+        return getForumById(payload)
+            .then(async (res) => {
+                actions.setIsGetForumByIdSuccess(true)
+                return res.data;
+            })
+            .catch((error) => {
+                actions.setIsGetForumByIdSuccess(false)
                 actions.setMessageErrorForum(error?.response?.data?.message)
             });
     }),
@@ -94,6 +120,23 @@ export const forumModel: IForumModel = persist({
             })
             .catch((error) => {
                 actions.setIsEditForumSuccess(false)
+                actions.setMessageErrorForum(error?.response?.data?.message)
+            });
+    }),
+
+    isUpdateStatusForumSuccess: true,
+    setIsUpdateStatusForum: action((state, payload) => {
+        state.isUpdateStatusForumSuccess = payload;
+    }),
+
+    updateStatusForum: thunk(async (actions, payload) => {
+        return updateStatusForum(payload)
+            .then(async (res) => {
+                actions.setIsUpdateStatusForum(true)
+                return res;
+            })
+            .catch((error) => {
+                actions.setIsUpdateStatusForum(false)
                 actions.setMessageErrorForum(error?.response?.data?.message)
             });
     }),

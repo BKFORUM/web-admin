@@ -23,7 +23,8 @@ const DateTimePicker: FC<Props> = ({ error, onChange, value }: Props): JSX.Eleme
           backgroundColor: '#E6F0F6',
           borderRadius: '8px',
         }}
-        value={value === '' ? dayjs() : value}
+        format='DD-MM-YYYY'
+        value={value === '' ? dayjs() : dayjs(value)}
         onChange={onChange}
       />
       {!!error && <span className='text-red-600 text-sm'>{error?.message}</span>}

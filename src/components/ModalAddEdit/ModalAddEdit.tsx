@@ -58,6 +58,7 @@ const ModalAddEdit: FC<Props<any>> = ({
 
             {page === 'USER' && (
               <ModalAddUser
+                rowSelected={rowSelected}
                 handleClose={handleClose}
                 handleAction={handleAction}
               />
