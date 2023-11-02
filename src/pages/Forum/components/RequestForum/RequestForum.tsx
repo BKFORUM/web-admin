@@ -288,7 +288,7 @@ const RequestForum: FC<Props> = (): JSX.Element => {
         ),
     },
     {
-      field: 'createAt',
+      field: 'createdAt',
       headerName: 'Create at',
       type: 'string',
       minWidth: 100,
@@ -298,9 +298,9 @@ const RequestForum: FC<Props> = (): JSX.Element => {
       disableColumnMenu: true,
       hideable: false,
       renderCell: (params: GridRenderCellParams<any, string>) => (
-        <Tooltip title={formatDateLocalV2(params.row.createAt)}>
+        <Tooltip title={formatDateLocalV2(params.row.createdAt)}>
           <p className={`text-black line-clamp-1`}>
-            {formatDateLocalV2(params.row.createAt)}
+            {formatDateLocalV2(params.row.createdAt)}
           </p>
         </Tooltip>
       ),

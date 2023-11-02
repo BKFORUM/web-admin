@@ -10,10 +10,7 @@ import {
   forumStateSelector,
   notifyActionSelector,
 } from '@store/index'
-import { IUserForum } from '@interfaces/IUser'
-import { IForumDetail } from '@interfaces/IForum'
 import ForumUserDetail from '../ForumUserDetail'
-import { IPostForum } from '@interfaces/IPost'
 import ForumPostDetail from '../ForumPostDetail'
 
 interface Props {}
@@ -22,13 +19,11 @@ const ViewForum: FC<Props> = (): JSX.Element => {
   const navigate = useNavigate()
   const { id } = useParams()
 
-  const { addUserToForum, setIsAddUserToForumSuccess, getForumById } =
+  const { addUserToForum, setIsAddUserToForumSuccess, getForumById, setForumDetail } =
     useStoreActions(forumActionSelector)
-  const { messageErrorForum, isAddUserToForumSuccess } = useStoreState(forumStateSelector)
-  const [data, setData] = useState<IForumDetail | null>(null)
+  const { messageErrorForum, isAddUserToForumSuccess, forumDetail } =
+    useStoreState(forumStateSelector)
   const { setNotifySetting } = useStoreActions(notifyActionSelector)
-  const [rowsUserData, setRowsUserData] = useState<IUserForum[]>([])
-  const [rowsPostData, setRowsPostData] = useState<IPostForum[]>([])
   const [loading, setLoading] = useState<boolean>(false)
   const [tab, setTab] = useState<string>('members')
   const [openModalEdit, setOpenModalEdit] = useState<boolean>(false)
@@ -37,21 +32,22 @@ const ViewForum: FC<Props> = (): JSX.Element => {
     setLoading(true)
     if (id !== undefined) {
       const res = await getForumById(id)
-      setData(res)
-      setLoading(false)
+      if (res) {
+        setLoading(false)
+      }
     }
     setLoading(false)
   }
 
   useEffect(() => {
-    if (data === null) {
+    setForumDetail(null)
+  }, [id])
+
+  useEffect(() => {
+    if (forumDetail === null) {
       getAllUserPage()
-    } else {
-      const userRowsDataTMP = data.users?.map((item: { user: IUserForum }) => item.user)
-      setRowsUserData(userRowsDataTMP)
-      setRowsPostData(data.posts)
     }
-  }, [data])
+  }, [forumDetail])
 
   useEffect(() => {
     if (!isAddUserToForumSuccess) {
@@ -82,7 +78,7 @@ const ViewForum: FC<Props> = (): JSX.Element => {
             onClick={() => navigate('/')}
             sx={{ fontSize: 20, marginBottom: 0.2, marginRight: 2, cursor: 'pointer' }}
           />
-          Forum: <span className='ml-4  text-[#3E9FDA]'>{data?.name}</span>
+          Forum: <span className='ml-4  text-[#3E9FDA]'>{forumDetail?.name}</span>
         </h2>
         <div className='my-8 grid xs:grid-cols-2 md:grid-cols-4 gap-4'>
           <div
@@ -94,7 +90,7 @@ const ViewForum: FC<Props> = (): JSX.Element => {
               className={`text-lg text-[#3E9FDA] font-bold ${
                 tab === 'members' && 'text-white'
               }`}>
-              {data?.users.length}
+              {forumDetail?.users.length}
             </span>
             <span className={`${tab === 'members' && 'text-white'}`}>Members</span>
           </div>
@@ -107,7 +103,7 @@ const ViewForum: FC<Props> = (): JSX.Element => {
               className={`text-lg text-[#3E9FDA] font-bold ${
                 tab === 'posts' && 'text-white'
               }`}>
-              {data?.posts.length}
+              {forumDetail?.posts.length}
             </span>
             <span className={`${tab === 'posts' && 'text-white'}`}>Post</span>
           </div>
@@ -140,18 +136,8 @@ const ViewForum: FC<Props> = (): JSX.Element => {
         </div>
 
         <div className=' w-full overflow-x-hidden'>
-          {tab === 'members' && (
-            <ForumUserDetail
-              rowsData={rowsUserData}
-              loading={loading}
-            />
-          )}
-          {tab === 'posts' && (
-            <ForumPostDetail
-              rowsData={rowsPostData}
-              loading={loading}
-            />
-          )}
+          {tab === 'members' && <ForumUserDetail />}
+          {tab === 'posts' && <ForumPostDetail />}
           {tab === 'events' && <span>Events</span>}
           {tab === 'moderator' && <span>Moderator</span>}
         </div>
@@ -171,6 +157,7 @@ const ViewForum: FC<Props> = (): JSX.Element => {
         open={openModalEdit}
         handleClose={setOpenModalEdit}
         handleAction={handleAddUserToForum}
+        loading={loading}
         page='VIEW_FORUM'
       />
     </>

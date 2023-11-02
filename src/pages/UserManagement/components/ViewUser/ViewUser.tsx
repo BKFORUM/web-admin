@@ -1,7 +1,6 @@
 import { FC, useEffect, useState } from 'react'
 import ArrowBackIosOutlinedIcon from '@mui/icons-material/ArrowBackIosOutlined'
 import { useNavigate, useParams } from 'react-router-dom'
-import test from '../../../../assets/images/test.jpg'
 import {
   HiOutlineLocationMarker,
   HiOutlineMail,
@@ -20,99 +19,13 @@ import { formatDateFormDateLocal } from '@utils/functions/formatDay'
 
 interface Props {}
 
-const FakeData = [
-  {
-    name: '20TCLC_DT4',
-    avatarURL: test,
-    topics: ['Lớp sinh hoạt'],
-    totalMember: 40,
-  },
-  {
-    name: 'Vì yêu là cứ đâm đầu',
-    avatarURL: test,
-    topics: ['Fan', 'Người theo dõi', 'Người ủng hộ'],
-    totalMember: 40,
-  },
-  {
-    name: 'Vì yêu là cứ đâm đầu',
-    avatarURL: test,
-    topics: ['Fan', 'Người theo dõi', 'Người ủng hộ'],
-    totalMember: 40,
-  },
-  {
-    name: 'Vì yêu là cứ đâm đầu',
-    avatarURL: test,
-    topics: ['Fan', 'Người theo dõi', 'Người ủng hộ'],
-    totalMember: 40,
-  },
-  {
-    name: 'Vì yêu là cứ đâm đầu',
-    avatarURL: test,
-    topics: ['Fan', 'Người theo dõi', 'Người ủng hộ'],
-    totalMember: 40,
-  },
-  {
-    name: 'Vì yêu là cứ đâm đầu',
-    avatarURL: test,
-    topics: ['Fan', 'Người theo dõi', 'Người ủng hộ'],
-    totalMember: 40,
-  },
-  {
-    name: 'Vì yêu là cứ đâm đầu',
-    avatarURL: test,
-    topics: ['Fan', 'Người theo dõi', 'Người ủng hộ'],
-    totalMember: 40,
-  },
-  {
-    name: 'Vì yêu là cứ đâm đầu',
-    avatarURL: test,
-    topics: ['Fan', 'Người theo dõi', 'Người ủng hộ'],
-    totalMember: 40,
-  },
-  {
-    name: 'Vì yêu là cứ đâm đầu',
-    avatarURL: test,
-    topics: ['Fan', 'Người theo dõi', 'Người ủng hộ'],
-    totalMember: 40,
-  },
-  {
-    name: 'Vì yêu là cứ đâm đầu',
-    avatarURL: test,
-    topics: ['Fan', 'Người theo dõi', 'Người ủng hộ'],
-    totalMember: 40,
-  },
-  {
-    name: 'Vì yêu là cứ đâm đầu',
-    avatarURL: test,
-    topics: ['Fan', 'Người theo dõi', 'Người ủng hộ'],
-    totalMember: 40,
-  },
-  {
-    name: 'Vì yêu là cứ đâm đầu',
-    avatarURL: test,
-    topics: ['Fan', 'Người theo dõi', 'Người ủng hộ'],
-    totalMember: 40,
-  },
-  {
-    name: 'Vì yêu là cứ đâm đầu',
-    avatarURL: test,
-    topics: ['Fan', 'Người theo dõi', 'Người ủng hộ'],
-    totalMember: 40,
-  },
-  {
-    name: 'Vì yêu là cứ đâm đầu',
-    avatarURL: test,
-    topics: ['Fan', 'Người theo dõi', 'Người ủng hộ'],
-    totalMember: 40,
-  },
-]
-
 const ViewUser: FC<Props> = (): JSX.Element => {
   const navigate = useNavigate()
   const { id } = useParams()
   const { setNotifySetting } = useStoreActions(notifyActionSelector)
   const { getUserById, editEdit, setIsEditUserSuccess } =
     useStoreActions(userActionSelector)
+  const [loading, setLoading] = useState<boolean>(false)
   const { messageErrorUser, isEditUserSuccess } = useStoreState(userStateSelector)
   const [value, setValue] = useState(0)
   const [openModalEdit, setOpenModalEdit] = useState(false)
@@ -148,6 +61,7 @@ const ViewUser: FC<Props> = (): JSX.Element => {
   }
 
   const handleAction = async (data: any): Promise<void> => {
+    setLoading(true)
     const yourTime = new Date(data?.dateOfBirth)
     const res = await editEdit({ ...data, dateOfBirth: yourTime.toISOString() })
     if (res) {
@@ -159,6 +73,7 @@ const ViewUser: FC<Props> = (): JSX.Element => {
       getUserByIdViewUser()
       setOpenModalEdit(false)
     }
+    setLoading(false)
   }
   return (
     <>
@@ -233,16 +148,7 @@ const ViewUser: FC<Props> = (): JSX.Element => {
           <TabPanel
             value={value}
             index={0}>
-            <div
-              className='grid grid-cols-2 gap-4 flex-1 overflow-y-auto shrink'
-              style={{ maxHeight: 'calc(100vh - 240px)' }}>
-              {FakeData.map((item, index) => (
-                <ForumUserItem
-                  key={index}
-                  item={item}
-                />
-              ))}
-            </div>
+            <ForumUserItem />
           </TabPanel>
 
           <TabPanel
@@ -255,6 +161,7 @@ const ViewUser: FC<Props> = (): JSX.Element => {
 
       {openModalEdit ? (
         <ModalAddEdit
+          loading={loading}
           open={openModalEdit}
           rowSelected={rowSelected}
           handleClose={() => setOpenModalEdit(false)}

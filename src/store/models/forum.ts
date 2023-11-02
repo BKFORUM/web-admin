@@ -1,6 +1,6 @@
 import { persist, action, Action, Thunk, thunk } from "easy-peasy";
-import { addForum, addUserToForum, deleteForum, editForum, getAllForum, getAllTopic, getForumById, updateStatusForum } from "../../services/forum.service";
-import { IFormDataForum, IListUserRequest, IRequestForumData } from "@interfaces/IForum";
+import { addForum, addUserToForum, deleteForum, deleteUserFromForum, editForum, getAllForum, getAllTopic, getForumById, updateStatusForum } from "../../services/forum.service";
+import { IFormDataForum, IForumDetail, IListUserRequest, IRequestForumData } from "@interfaces/IForum";
 
 export interface IForumModel {
     //MessageError
@@ -13,6 +13,8 @@ export interface IForumModel {
     getAllForum: Thunk<IForumModel, any>;
 
     //GetForumById
+    forumDetail: null | IForumDetail;
+    setForumDetail: Action<IForumModel, null | IForumDetail>
     isGetForumByIdSuccess: boolean;
     setIsGetForumByIdSuccess: Action<IForumModel, boolean>
     getForumById: Thunk<IForumModel, any>;
@@ -32,7 +34,12 @@ export interface IForumModel {
     setIsDeleteForumSuccess: Action<IForumModel, boolean>
     deleteForum: Thunk<IForumModel, string>;
 
-    //AddUserToForum
+    //DeleteUserFromForum
+    isDeleteUserFromForumSuccess: boolean;
+    setIsDeleteUserFromForumSuccess: Action<IForumModel, boolean>
+    deleteUserFromForum: Thunk<IForumModel, any>;
+
+    //DeleteUser
     isAddUserToForumSuccess: boolean;
     setIsAddUserToForumSuccess: Action<IForumModel, boolean>
     addUserToForum: Thunk<IForumModel, IListUserRequest>;
@@ -73,6 +80,11 @@ export const forumModel: IForumModel = persist({
             });
     }),
 
+    //GetForumById
+    forumDetail: null,
+    setForumDetail: action((state, payload) => {
+        state.forumDetail = payload;
+    }),
     isGetForumByIdSuccess: true,
     setIsGetForumByIdSuccess: action((state, payload) => {
         state.isGetForumByIdSuccess = payload;
@@ -81,10 +93,12 @@ export const forumModel: IForumModel = persist({
         return getForumById(payload)
             .then(async (res) => {
                 actions.setIsGetForumByIdSuccess(true)
+                actions.setForumDetail(res.data)
                 return res.data;
             })
             .catch((error) => {
                 actions.setIsGetForumByIdSuccess(false)
+                actions.setForumDetail(null)
                 actions.setMessageErrorForum(error?.response?.data?.message)
             });
     }),
@@ -172,6 +186,24 @@ export const forumModel: IForumModel = persist({
             })
             .catch((error) => {
                 actions.setIsAddUserToForumSuccess(false)
+                actions.setMessageErrorForum(error?.response?.data?.message)
+            });
+    }),
+
+    //DeleteUserFromForum
+    isDeleteUserFromForumSuccess: true,
+    setIsDeleteUserFromForumSuccess: action((state, payload) => {
+        state.isDeleteUserFromForumSuccess = payload;
+    }),
+
+    deleteUserFromForum: thunk(async (actions, payload) => {
+        return deleteUserFromForum(payload)
+            .then(async (res) => {
+                actions.setIsDeleteUserFromForumSuccess(true)
+                return res;
+            })
+            .catch((error) => {
+                actions.setIsDeleteUserFromForumSuccess(false)
                 actions.setMessageErrorForum(error?.response?.data?.message)
             });
     }),

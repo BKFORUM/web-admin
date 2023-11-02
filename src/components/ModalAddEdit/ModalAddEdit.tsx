@@ -7,6 +7,7 @@ interface Props<T> {
   open: boolean
   handleClose: React.Dispatch<React.SetStateAction<boolean>>
   handleAction: (data: any) => Promise<void>
+  loading?: boolean
   data?: any
   setData?: any
   page?: any
@@ -32,6 +33,7 @@ const ModalAddEdit: FC<Props<any>> = ({
   handleAction,
   page,
   rowSelected,
+  loading,
 }): JSX.Element => {
   return (
     <div>
@@ -44,6 +46,7 @@ const ModalAddEdit: FC<Props<any>> = ({
           <Box>
             {page === 'FORUM' && (
               <ModalAddEditForum
+                loading={loading}
                 rowSelected={rowSelected}
                 handleClose={handleClose}
                 handleAction={handleAction}
@@ -51,6 +54,7 @@ const ModalAddEdit: FC<Props<any>> = ({
             )}
             {page === 'VIEW_FORUM' && (
               <ModalAddUserForum
+                loading={loading}
                 handleClose={handleClose}
                 handleAction={handleAction}
               />
@@ -58,6 +62,7 @@ const ModalAddEdit: FC<Props<any>> = ({
 
             {page === 'USER' && (
               <ModalAddUser
+                loading={loading}
                 rowSelected={rowSelected}
                 handleClose={handleClose}
                 handleAction={handleAction}

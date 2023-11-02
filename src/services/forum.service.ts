@@ -62,4 +62,12 @@ const addUserToForum = (data: IListUserRequest) => {
     });
 }
 
-export { getAllForum, addForum, addUserToForum, getAllTopic, editForum, deleteForum, getForumById, updateStatusForum }
+const deleteUserFromForum = (data: any) => {
+    return BaseURL({
+        url: `/forums/${data.id}/requests`,
+        method: "PATCH",
+        data,
+    });
+}
+
+export { getAllForum, addForum, addUserToForum, getAllTopic, editForum, deleteForum, getForumById, updateStatusForum, deleteUserFromForum }

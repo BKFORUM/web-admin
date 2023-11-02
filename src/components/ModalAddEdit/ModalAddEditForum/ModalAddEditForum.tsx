@@ -22,6 +22,7 @@ interface Props<T> {
   handleAction: (data: any) => Promise<void>
   handleClose: React.Dispatch<React.SetStateAction<boolean>>
   rowSelected?: T
+  loading: boolean
 }
 
 const optionTypes: IOption[] = [
@@ -55,6 +56,7 @@ const ModalAddEditForum: FC<Props<IFormDataForum>> = ({
   handleAction,
   handleClose,
   rowSelected,
+  loading,
 }: Props<IFormDataForum>): JSX.Element => {
   const { isGetAllUserSuccess, messageErrorUser } = useStoreState(userStateSelector)
   const { getAllUser, setIsGetAllUserSuccess } = useStoreActions(userActionSelector)
@@ -104,7 +106,6 @@ const ModalAddEditForum: FC<Props<IFormDataForum>> = ({
 
   const onSubmit = async (data: IFormDataForum) => {
     handleAction(data)
-    handleClose(false)
   }
 
   const selectedType = watch('type')
@@ -225,6 +226,7 @@ const ModalAddEditForum: FC<Props<IFormDataForum>> = ({
         )}
 
         <FooterModal
+          loading={loading}
           isEdit={rowSelected !== undefined}
           handleSubmitAction={onSubmit}
           handleClose={handleClose}

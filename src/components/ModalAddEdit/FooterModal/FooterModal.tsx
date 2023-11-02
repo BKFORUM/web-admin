@@ -4,9 +4,15 @@ interface IProps {
   handleSubmitAction: (data: any) => Promise<void>
   handleClose: React.Dispatch<React.SetStateAction<boolean>>
   isEdit?: boolean
+  loading: boolean
 }
 
-export default function FooterModal({ handleSubmitAction, handleClose, isEdit }: IProps) {
+export default function FooterModal({
+  handleSubmitAction,
+  handleClose,
+  isEdit,
+  loading,
+}: IProps) {
   return (
     <div>
       <Box
@@ -26,8 +32,8 @@ export default function FooterModal({ handleSubmitAction, handleClose, isEdit }:
           typeButton='primary'
           type='submit'
           onSubmit={handleSubmitAction}
-          disabled={false}
-          loading={false}>
+          disabled={loading}
+          loading={loading}>
           {isEdit ? 'Save' : 'Add'}
         </Button>
 

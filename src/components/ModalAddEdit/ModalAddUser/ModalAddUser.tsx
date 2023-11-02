@@ -17,6 +17,7 @@ interface Props<T> {
   handleAction: (data: any) => Promise<void>
   handleClose: React.Dispatch<React.SetStateAction<boolean>>
   rowSelected?: T
+  loading: boolean
 }
 
 const optionsGender: IOption[] = [
@@ -61,6 +62,7 @@ const ModalAddUser: FC<Props<IUser>> = ({
   handleClose,
   handleAction,
   rowSelected,
+  loading,
 }: Props<IUser>): JSX.Element => {
   const { getAllFaculty } = useStoreActions(facultyActionSelector)
   const [optionsFaculty, setOptionFaculty] = useState<IOption[]>([])
@@ -87,6 +89,7 @@ const ModalAddUser: FC<Props<IUser>> = ({
     phoneNumber: rowSelected?.phoneNumber || '',
     address: rowSelected?.address || '',
   }
+
   const {
     handleSubmit,
     control,
@@ -240,7 +243,6 @@ const ModalAddUser: FC<Props<IUser>> = ({
             <TextFieldV2
               name='phoneNumber'
               control={control}
-              // placeholder='name'
             />
           </div>
 
@@ -253,11 +255,11 @@ const ModalAddUser: FC<Props<IUser>> = ({
             <TextFieldV2
               name='address'
               control={control}
-              // placeholder='name'
             />
           </div>
 
           <FooterModal
+            loading={loading}
             isEdit={rowSelected !== undefined}
             handleSubmitAction={onSubmit}
             handleClose={handleClose}

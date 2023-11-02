@@ -93,8 +93,10 @@ const ForumTab: FC<Props> = (): JSX.Element => {
         event: 40,
       }))
       setRows(data)
+      setLoading(false)
+    } else {
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   useEffect(() => {
@@ -152,6 +154,7 @@ const ForumTab: FC<Props> = (): JSX.Element => {
   }
 
   const handleAction = async (data: any): Promise<void> => {
+    setLoading(true)
     if (rowSelected !== undefined) {
       const res = await editForum(data)
       if (res) {
@@ -173,6 +176,8 @@ const ForumTab: FC<Props> = (): JSX.Element => {
         getAllForumTab()
       }
     }
+    setLoading(false)
+    setOpenModalEdit(false)
   }
 
   const columnsForums = [
@@ -337,6 +342,7 @@ const ForumTab: FC<Props> = (): JSX.Element => {
       ) : null}
       {openModalEdit ? (
         <ModalAddEdit
+          loading={loading}
           open={openModalEdit}
           rowSelected={rowSelected}
           handleClose={() => setOpenModalEdit(false)}

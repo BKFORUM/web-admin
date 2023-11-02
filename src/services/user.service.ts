@@ -32,4 +32,11 @@ const editUser = (data: IUser) => {
     });
 }
 
-export { getAllUser, addUser, getUserById, editUser }
+const getAllForumByUser = (id: string) => {
+    return BaseURL({
+        url: `/users/${id}/forums`,
+        method: "GET",
+    });
+}
+
+export { getAllUser, addUser, getUserById, editUser, getAllForumByUser }

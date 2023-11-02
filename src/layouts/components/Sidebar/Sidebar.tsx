@@ -30,7 +30,7 @@ const Sidebar: FC<IProps> = ({ open }: IProps): JSX.Element => {
         setSelected(item.id)
       }
     })
-  }, [])
+  }, [pathname])
   const _renderIcon = useCallback((dataSidebar: IDataSidebar) => {
     let result = null
     switch (dataSidebar?.icon) {

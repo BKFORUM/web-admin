@@ -7,7 +7,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import Button from '@components/Button/Button'
 import SearchInput from '@components/SearchInput'
-import ModalConfirm from '@components/ModalConfirm'
+// import ModalConfirm from '@components/ModalConfirm'
 import ModalAddEdit from '@components/ModalAddEdit'
 import { useNavigate } from 'react-router-dom'
 import { useStoreActions, useStoreState } from 'easy-peasy'
@@ -38,7 +38,7 @@ const UserManagement: FC<Props> = (): JSX.Element => {
     },
   ])
   const [loading, setLoading] = useState<boolean>(false)
-  const [openModalDelete, setOpenModalDelete] = useState(false)
+  // const [openModalDelete, setOpenModalDelete] = useState(false)
   const [openModalEdit, setOpenModalEdit] = useState(false)
   const [rowSelected, setRowSelected] = useState<IUser | undefined>(undefined)
 
@@ -97,8 +97,8 @@ const UserManagement: FC<Props> = (): JSX.Element => {
   }
 
   const handleAction = async (data: any): Promise<void> => {
-    console.log(data)
     const yourTime = new Date(data?.dateOfBirth)
+    setLoading(true)
     const res = await addUser({ ...data, dateOfBirth: yourTime.toISOString() })
     if (res) {
       setNotifySetting({
@@ -108,6 +108,9 @@ const UserManagement: FC<Props> = (): JSX.Element => {
       })
       setOpenModalEdit(false)
       getAllUserPage()
+      setLoading(false)
+    } else {
+      setLoading(false)
     }
   }
 
@@ -230,7 +233,7 @@ const UserManagement: FC<Props> = (): JSX.Element => {
             sx={{ color: '#d32f2f', cursor: 'pointer' }}
             onClick={() => {
               setRowSelected(params.params.row.id)
-              setOpenModalDelete(true)
+              // setOpenModalDelete(true)
             }}
           />
         </div>
@@ -273,7 +276,7 @@ const UserManagement: FC<Props> = (): JSX.Element => {
         </div>
       </div>
 
-      {openModalDelete ? (
+      {/* {openModalDelete ? (
         <ModalConfirm
           open={openModalDelete}
           handleClose={() => {
@@ -281,9 +284,10 @@ const UserManagement: FC<Props> = (): JSX.Element => {
           }}
           // handleDelete={handleDeleteOrder}
         />
-      ) : null}
+      ) : null} */}
       {openModalEdit ? (
         <ModalAddEdit
+          loading={loading}
           open={openModalEdit}
           rowSelected={rowSelected}
           handleClose={() => setOpenModalEdit(false)}

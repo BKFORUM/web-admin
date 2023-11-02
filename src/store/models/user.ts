@@ -1,5 +1,5 @@
 import { persist, action, Action, Thunk, thunk } from "easy-peasy";
-import { addUser, editUser, getAllUser, getUserById } from "../../services/user.service";
+import { addUser, editUser, getAllForumByUser, getAllUser, getUserById } from "../../services/user.service";
 import { IUser } from "@interfaces/IUser";
 
 export interface IUserModel {
@@ -26,6 +26,11 @@ export interface IUserModel {
     isEditUserSuccess: boolean;
     setIsEditUserSuccess: Action<IUserModel, boolean>;
     editEdit: Thunk<IUserModel, IUser>;
+
+    //GetAllForumByUser
+    isGetAllForumByUserSuccess: boolean;
+    setIsGetAllForumByUserSuccess: Action<IUserModel, boolean>;
+    getAllForumByUser: Thunk<IUserModel, string>;
 }
 
 export const userModel: IUserModel = persist({
@@ -99,6 +104,23 @@ export const userModel: IUserModel = persist({
             })
             .catch((error) => {
                 actions.setIsEditUserSuccess(false)
+                actions.setMessageErrorUser(error?.response?.data?.message)
+            });
+    }),
+
+    //GetALLForumByUser
+    isGetAllForumByUserSuccess: true,
+    setIsGetAllForumByUserSuccess: action((state, payload) => {
+        state.isGetAllForumByUserSuccess = payload;
+    }),
+    getAllForumByUser: thunk(async (actions, payload) => {
+        return getAllForumByUser(payload)
+            .then(async (res) => {
+                actions.setIsGetAllUserSuccess(true)
+                return res.data;
+            })
+            .catch((error) => {
+                actions.setIsGetAllUserSuccess(false)
                 actions.setMessageErrorUser(error?.response?.data?.message)
             });
     }),

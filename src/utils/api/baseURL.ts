@@ -35,7 +35,7 @@ BaseURL.interceptors.response.use(
         originalConfig._retry = true;
         const user: any = JSON.parse(String(localStorage.getItem("user")));
         try {
-          const res = await axios.get('http://52.139.152.154/auth/refresh', {
+          const res = await axios.get('http://52.139.152.154/api/v1/auth/refresh', {
             headers: {
               Authorization: `Bearer ${user?.refresh_token}`
             }

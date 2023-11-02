@@ -1,3 +1,4 @@
+import { ITopic } from "./ITopics";
 
 export interface IUserLogin {
     email: string;
@@ -24,6 +25,22 @@ export interface IUserForum {
     dateOfBirth: string
     gender: string
     avatarUrl: string
+}
+
+export interface IUserForumResponse {
+    id: string
+    name: string
+    createdAt: string
+    status: string
+    avatarUrl?: string
+    type: string
+    moderator: IUser
+    topics: [
+        topic: ITopic
+    ]
+    _count: {
+        users: number
+    }
 }
 
 export interface IUser {

@@ -1,17 +1,35 @@
 import { Tooltip } from '@mui/material'
 import { GridRenderCellParams, GridSortModel } from '@mui/x-data-grid'
 import { formatDateFormDateLocal } from '@utils/functions/formatDay'
-import { FC, useCallback, useState } from 'react'
+import { FC, useCallback, useEffect, useState } from 'react'
 import DeleteIcon from '@mui/icons-material/Delete'
 import { IUserForum } from '@interfaces/IUser'
 import Table from '@components/Table'
+import { useStoreActions, useStoreState } from 'easy-peasy'
+import {
+  forumActionSelector,
+  forumStateSelector,
+  notifyActionSelector,
+} from '@store/index'
+import { useParams } from 'react-router-dom'
+import ModalConfirm from '@components/ModalConfirm'
 
-interface Props {
-  rowsData: IUserForum[]
-  loading: boolean
-}
+interface Props {}
 
-const ForumUserDetail: FC<Props> = ({ ...props }: Props): JSX.Element => {
+const ForumUserDetail: FC<Props> = (): JSX.Element => {
+  const { id } = useParams()
+  const { setNotifySetting } = useStoreActions(notifyActionSelector)
+  const { setForumDetail, deleteUserFromForum, setIsDeleteUserFromForumSuccess } =
+    useStoreActions(forumActionSelector)
+  const { forumDetail, isDeleteUserFromForumSuccess, messageErrorForum } =
+    useStoreState(forumStateSelector)
+
+  const [loading, setLoading] = useState<boolean>(false)
+  const [openModalDelete, setOpenModalDelete] = useState(false)
+  const [rowSelected, setRowSelected] = useState<string>('')
+
+  const userRowsData = forumDetail?.users.map((item: { user: IUserForum }) => item.user)
+
   const [sortModel, setSortModel] = useState<GridSortModel>([
     {
       field: 'fullName',
@@ -19,9 +37,43 @@ const ForumUserDetail: FC<Props> = ({ ...props }: Props): JSX.Element => {
     },
   ])
 
+  const handleDeleteUser = async () => {
+    if (id) {
+      setLoading(true)
+      const res = await deleteUserFromForum({
+        id: id,
+        userId: rowSelected,
+        status: 'DELETED',
+      })
+      if (res) {
+        setNotifySetting({
+          show: true,
+          status: 'success',
+          message: 'Delete user successful',
+        })
+        if (forumDetail !== null) {
+          const newData = forumDetail?.users.filter((item) => {
+            return item.user.id !== rowSelected
+          }) as [{ user: IUserForum }]
+          setForumDetail({ ...forumDetail, users: newData })
+          setOpenModalDelete(false)
+        }
+        setLoading(false)
+      }
+    }
+  }
+
+  useEffect(() => {
+    if (!isDeleteUserFromForumSuccess) {
+      setNotifySetting({ show: true, status: 'error', message: messageErrorForum })
+      setIsDeleteUserFromForumSuccess(true)
+    }
+  }, [isDeleteUserFromForumSuccess])
+
   const handleSortModelChange = useCallback((newSortModel: GridSortModel) => {
     setSortModel(newSortModel)
   }, [])
+
   const columnsUserForums = [
     {
       field: 'fullName',
@@ -88,7 +140,6 @@ const ForumUserDetail: FC<Props> = ({ ...props }: Props): JSX.Element => {
     {
       field: 'action',
       headerName: 'Action',
-      // flex: 1,
       minWidth: 20,
       align: 'center',
       headerAlign: 'center',
@@ -99,21 +150,33 @@ const ForumUserDetail: FC<Props> = ({ ...props }: Props): JSX.Element => {
         <DeleteIcon
           sx={{ color: '#d32f2f', cursor: 'pointer' }}
           onClick={() => {
-            console.log(params.row.id)
+            setRowSelected(params.row.id)
+            setOpenModalDelete(true)
           }}
         />
       ),
     },
   ]
   return (
-    <Table
-      columns={columnsUserForums}
-      rows={props.rowsData}
-      sortModel={sortModel}
-      onSortModelChange={handleSortModelChange}
-      loading={props.loading}
-      hiddenFooter={true}
-    />
+    <>
+      <Table
+        columns={columnsUserForums}
+        rows={userRowsData || []}
+        sortModel={sortModel}
+        onSortModelChange={handleSortModelChange}
+        loading={loading}
+        hiddenFooter={true}
+      />
+      {openModalDelete ? (
+        <ModalConfirm
+          open={openModalDelete}
+          handleClose={() => {
+            setOpenModalDelete(false)
+          }}
+          handleDelete={handleDeleteUser}
+        />
+      ) : null}
+    </>
   )
 }
 
