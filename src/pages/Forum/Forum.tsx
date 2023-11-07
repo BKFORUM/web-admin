@@ -17,6 +17,7 @@ const Forum: FC<Props> = (): JSX.Element => {
   }
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+    console.log(event)
     setValue(newValue)
   }
 

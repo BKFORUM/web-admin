@@ -28,6 +28,7 @@ const AutocompleteCustom: FC<IProps> = ({
         disabled={disabled}
         options={updatedOptions}
         onChange={(event, option) => {
+          console.log(event)
           if (option === null) onChange('')
           else onChange(option.id)
         }}

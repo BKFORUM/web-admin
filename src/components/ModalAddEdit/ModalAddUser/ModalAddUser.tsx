@@ -11,7 +11,7 @@ import { Gender, ROLE } from '@commom/enum'
 import AutocompleteCustom from '@components/Autocomplete/Autocomplete'
 import { useStoreActions } from 'easy-peasy'
 import { facultyActionSelector } from '@store/index'
-import { IUser } from '@interfaces/IUser'
+import { IUser, IUserDetail } from '@interfaces/IUser'
 
 interface Props<T> {
   handleAction: (data: any) => Promise<void>
@@ -58,12 +58,12 @@ const schema = yup.object().shape({
   phoneNumber: yup.string().required('Phone number is valid!'),
 })
 
-const ModalAddUser: FC<Props<IUser>> = ({
+const ModalAddUser: FC<Props<IUserDetail>> = ({
   handleClose,
   handleAction,
   rowSelected,
   loading,
-}: Props<IUser>): JSX.Element => {
+}: Props<IUserDetail>): JSX.Element => {
   const { getAllFaculty } = useStoreActions(facultyActionSelector)
   const [optionsFaculty, setOptionFaculty] = useState<IOption[]>([])
 
@@ -83,7 +83,7 @@ const ModalAddUser: FC<Props<IUser>> = ({
     fullName: rowSelected?.fullName || '',
     dateOfBirth: rowSelected?.dateOfBirth || '',
     gender: rowSelected?.gender || '',
-    facultyId: rowSelected?.facultyId || '',
+    facultyId: rowSelected?.faculty?.id || '',
     type: rowSelected?.type || '',
     email: rowSelected?.email || '',
     phoneNumber: rowSelected?.phoneNumber || '',
@@ -193,7 +193,7 @@ const ModalAddUser: FC<Props<IUser>> = ({
                     value={value}
                     error={error}
                     options={optionsFaculty}
-                    placeholder='Select moderator'
+                    placeholder='Select faculty'
                   />
                 )}
               />
@@ -214,6 +214,7 @@ const ModalAddUser: FC<Props<IUser>> = ({
                     value={value}
                     options={optionsRole}
                     empty='Select role'
+                    disabled={rowSelected !== undefined ? true : false}
                   />
                 )}
               />

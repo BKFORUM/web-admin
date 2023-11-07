@@ -7,9 +7,7 @@ interface Props<T> {
   open: boolean
   handleClose: React.Dispatch<React.SetStateAction<boolean>>
   handleAction: (data: any) => Promise<void>
-  loading?: boolean
-  data?: any
-  setData?: any
+  loading: boolean
   page?: any
   rowSelected?: T
 }
