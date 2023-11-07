@@ -8,6 +8,7 @@ interface Props {
   value: string
   empty?: string
   options?: IOption[]
+  disabled?: boolean
 }
 
 // const options = [
@@ -22,10 +23,12 @@ const Selected: FC<Props> = ({
   value,
   empty,
   options,
+  disabled,
 }: Props): JSX.Element => {
   return (
     <FormControl
       sx={{ width: '100%' }}
+      disabled={disabled}
       error={!!error}>
       <Select
         sx={{

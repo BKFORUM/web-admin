@@ -57,6 +57,7 @@ export interface IUser {
 
 export interface IUserDetail extends IUser {
     faculty?: {
+        id: string
         name: string
     }
     avatarUrl?: string

@@ -15,4 +15,6 @@ const deletePost = (id: string) => {
     });
 };
 
+
+
 export { getAllPost, deletePost }
