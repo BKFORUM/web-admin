@@ -1,5 +1,7 @@
 import dayjs from 'dayjs';
 import 'dayjs/locale/vi';
+import utcPlugin from 'dayjs/plugin/utc';
+dayjs.extend(utcPlugin);
 
 export const formatDayVN = (dateTime: string): string => {
     var myDate = new Date(dateTime)
@@ -22,6 +24,11 @@ export const formatDateLocalV2 = (dateTime: string): string => {
     const dateObject = dayjs(dateTime);
     const formattedDate = dateObject.format('DD-MM-YYYY HH:mm');
     return formattedDate;
+}
+
+export const formatDateTimeLocal = (dateTime: string): string => {
+    const formattedTime = dayjs(dateTime).utc().format('DD/MM/YYYY HH:mm');
+    return formattedTime;
 }
 
 export const dayComparedToThePast = (dateTime: string): string => {
