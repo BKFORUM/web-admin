@@ -18,7 +18,7 @@ const SearchInput: FC<IProps> = ({
   return (
     <Paper
       sx={{
-        p: size === 'small' ? '1px 4px' : '2px 4px',
+        p: size === 'small' ? '1px 4px' : '0px 2px',
         display: 'flex',
         alignItems: 'center',
         width: width ? width : 400,

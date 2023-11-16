@@ -3,11 +3,10 @@ import { GridRenderCellParams, GridSortModel } from '@mui/x-data-grid'
 import { FC, useCallback, useEffect, useState } from 'react'
 import Table from '@components/Table/Table'
 import AddIcon from '@mui/icons-material/Add'
-import DeleteIcon from '@mui/icons-material/Delete'
+// import DeleteIcon from '@mui/icons-material/Delete'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import Button from '@components/Button/Button'
 import SearchInput from '@components/SearchInput'
-// import ModalConfirm from '@components/ModalConfirm'
 import ModalAddEdit from '@components/ModalAddEdit'
 import { useNavigate } from 'react-router-dom'
 import { useStoreActions, useStoreState } from 'easy-peasy'
@@ -229,13 +228,13 @@ const UserManagement: FC<Props> = (): JSX.Element => {
               navigate('/user-management/' + params.params.row.id)
             }}
           />
-          <DeleteIcon
+          {/* <DeleteIcon
             sx={{ color: '#d32f2f', cursor: 'pointer' }}
             onClick={() => {
               setRowSelected(params.params.row.id)
               // setOpenModalDelete(true)
             }}
-          />
+          /> */}
         </div>
       </>
     )
@@ -245,10 +244,14 @@ const UserManagement: FC<Props> = (): JSX.Element => {
     <>
       <div>
         <div className='flex justify-between items-center '>
-          <SearchInput
-            value={inputSearch}
-            setValue={handleChangeSearch}
-          />
+          <div className='flex item-center justify-center'>
+            <h4 className='font-bold text-xl my-auto mr-6'>Users</h4>
+            <SearchInput
+              value={inputSearch}
+              setValue={handleChangeSearch}
+              width='300px'
+            />
+          </div>
           <Button
             typeButton='blue'
             onClick={() => {

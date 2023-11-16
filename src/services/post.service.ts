@@ -1,3 +1,4 @@
+import { IParams } from "@interfaces/IParameter";
 import BaseURL from "@utils/api/baseURL";
 
 const getAllPost = (params: any) => {
@@ -15,6 +16,21 @@ const deletePost = (id: string) => {
     });
 };
 
+const getAllCommentPost = ({ id, params }: IParams) => {
+    return BaseURL({
+        url: `/posts/${id}/comments`,
+        method: "GET",
+        params,
+    });
+}
+
+const getPostById = (id: string) => {
+    return BaseURL({
+        url: `/posts/${id}`,
+        method: "GET",
+    });
+}
 
 
-export { getAllPost, deletePost }
+
+export { getAllPost, deletePost, getAllCommentPost, getPostById }

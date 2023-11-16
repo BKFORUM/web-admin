@@ -8,8 +8,11 @@ export interface IForumTab {
     moderator: IModerator
     topicIds: string[]
     type: string
-    event: number
-    total_members: number
+    _count: {
+        users: number
+        posts: number
+        events: number
+    }
 }
 
 export interface IFormDataForum {

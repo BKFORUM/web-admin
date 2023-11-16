@@ -10,6 +10,8 @@ import { useStoreActions, useStoreState } from 'easy-peasy'
 import { notifyActionSelector, postActionSelector, postStateSelector } from '@store/index'
 import { IPost } from '@interfaces/IPost'
 import { formatDateLocalV2 } from '@utils/functions/formatDay'
+import ModalDetailPost from '@components/ModalDetailPost'
+import VisibilityIcon from '@mui/icons-material/Visibility'
 
 interface Props {}
 
@@ -35,7 +37,8 @@ const PostManagement: FC<Props> = (): JSX.Element => {
   ])
   const [loading, setLoading] = useState<boolean>(false)
   const [openModalDelete, setOpenModalDelete] = useState(false)
-  const [rowSelected, setRowSelected] = useState<string>('')
+  const [openModalPostDetail, setOpenModalPostDetail] = useState<boolean>(false)
+  const [rowSelected, setRowSelected] = useState<IPost | null>(null)
 
   const getAllPostPage = async (): Promise<void> => {
     setLoading(true)
@@ -50,8 +53,6 @@ const PostManagement: FC<Props> = (): JSX.Element => {
       const data = res?.data?.map((item: any, index: number) => ({
         ...item,
         tag: paginationModel.page * paginationModel.pageSize + index + 1,
-        totalLike: 40,
-        totalComment: 40,
       }))
       setRows(data)
       setLoading(false)
@@ -99,15 +100,17 @@ const PostManagement: FC<Props> = (): JSX.Element => {
   }, [])
 
   const handleDeletePost = async () => {
-    const res = await deletePost(rowSelected)
-    if (res) {
-      setNotifySetting({
-        show: true,
-        status: 'success',
-        message: 'Delete post successful',
-      })
-      setOpenModalDelete(false)
-      getAllPostPage()
+    if (rowSelected) {
+      const res = await deletePost(rowSelected.id)
+      if (res) {
+        setNotifySetting({
+          show: true,
+          status: 'success',
+          message: 'Delete post successful',
+        })
+        setOpenModalDelete(false)
+        getAllPostPage()
+      }
     }
   }
 
@@ -133,6 +136,7 @@ const PostManagement: FC<Props> = (): JSX.Element => {
       editable: false,
       align: 'left',
       headerAlign: 'left',
+      sortable: false,
       hideable: false,
       renderCell: (params: GridRenderCellParams<any, string>) => (
         <Tooltip title={params.row.forum.name}>
@@ -148,6 +152,7 @@ const PostManagement: FC<Props> = (): JSX.Element => {
       minWidth: 150,
       align: 'left',
       headerAlign: 'left',
+      sortable: false,
       hideable: false,
       renderCell: (params: GridRenderCellParams<any, string>) => (
         <Tooltip title={params.row.user.fullName}>
@@ -165,6 +170,9 @@ const PostManagement: FC<Props> = (): JSX.Element => {
       hideable: false,
       disableColumnMenu: true,
       sortable: false,
+      renderCell: (params: GridRenderCellParams<any, string>) => (
+        <p className={`text-black line-clamp-1`}>{params.row._count.comments}</p>
+      ),
     },
     {
       field: 'totalLike',
@@ -177,6 +185,9 @@ const PostManagement: FC<Props> = (): JSX.Element => {
       disableColumnMenu: true,
       sortable: false,
       hideable: false,
+      renderCell: (params: GridRenderCellParams<any, string>) => (
+        <p className={`text-black line-clamp-1`}>{params.row._count.likes}</p>
+      ),
     },
     {
       field: 'createdAt',
@@ -216,11 +227,17 @@ const PostManagement: FC<Props> = (): JSX.Element => {
     return (
       <>
         <div className={`flex gap-2`}>
+          <VisibilityIcon
+            sx={{ cursor: 'pointer', color: '#1278ccf0' }}
+            onClick={() => {
+              setRowSelected(params.params.row)
+              setOpenModalPostDetail(true)
+            }}
+          />
           <DeleteIcon
             sx={{ color: '#d32f2f', cursor: 'pointer' }}
             onClick={() => {
-              console.log(params)
-              setRowSelected(params.params.row.id)
+              setRowSelected(params.params.row)
               setOpenModalDelete(true)
             }}
           />
@@ -233,10 +250,14 @@ const PostManagement: FC<Props> = (): JSX.Element => {
     <>
       <div>
         <div className='flex justify-start items-center '>
-          <SearchInput
-            value={inputSearch}
-            setValue={handleChangeSearch}
-          />
+          <div className='flex item-center justify-center'>
+            <h4 className='font-bold text-xl my-auto mr-6'>Posts</h4>
+            <SearchInput
+              value={inputSearch}
+              setValue={handleChangeSearch}
+              width='300px'
+            />
+          </div>
         </div>
 
         <div className='mt-3 w-full overflow-x-hidden'>
@@ -252,6 +273,13 @@ const PostManagement: FC<Props> = (): JSX.Element => {
           />
         </div>
       </div>
+      {openModalPostDetail && (
+        <ModalDetailPost
+          item={rowSelected}
+          open={openModalPostDetail}
+          setOpen={setOpenModalPostDetail}
+        />
+      )}
 
       {openModalDelete ? (
         <ModalConfirm

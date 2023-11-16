@@ -68,7 +68,7 @@ const Login: FC<Props> = (): JSX.Element => {
       setIsLoading(false)
       var decoded: any = jwt_decode(res?.accessToken)
       const user = {
-        name: decoded?.name,
+        name: decoded?.fullName,
         exp: decoded?.exp,
         role: decoded?.roles[0],
         access_token: res?.accessToken,

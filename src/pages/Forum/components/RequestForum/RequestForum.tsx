@@ -257,6 +257,8 @@ const RequestForum: FC<Props> = (): JSX.Element => {
       align: 'left',
       headerAlign: 'left',
       hideable: false,
+      disableColumnMenu: true,
+      sortable: false,
       renderCell: (params: GridRenderCellParams<any, string>) =>
         params.row.topics.length > 2 ? (
           <div className='flex'>
@@ -329,6 +331,7 @@ const RequestForum: FC<Props> = (): JSX.Element => {
         <SearchInput
           value={inputSearch}
           setValue={handleChangeSearch}
+          width='300px'
         />
       </div>
 
