@@ -1,5 +1,6 @@
 import { IParams } from "@interfaces/IParameter";
 import BaseURL from "@utils/api/baseURL";
+import BaseURLUpLoadFile from "@utils/api/baseURLUpLoadFile";
 
 const getAllPost = (params: any) => {
     return BaseURL({
@@ -31,6 +32,14 @@ const getPostById = (id: string) => {
     });
 }
 
+const postImage = (data: any) => {
+    return BaseURLUpLoadFile({
+        url: `/images`,
+        method: "POST",
+        data,
+    });
+}
 
 
-export { getAllPost, deletePost, getAllCommentPost, getPostById }
+
+export { getAllPost, deletePost, getAllCommentPost, getPostById, postImage }

@@ -89,8 +89,6 @@ const ForumTab: FC<Props> = (): JSX.Element => {
         ...item,
         tag: paginationModel.page * paginationModel.pageSize + index + 1,
         topicIds: item?.topics.map((topic: ITopic) => topic.id),
-        total_members: 40,
-        event: 40,
       }))
       setRows(data)
       setLoading(false)

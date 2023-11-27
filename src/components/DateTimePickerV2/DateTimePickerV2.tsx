@@ -6,12 +6,13 @@ import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker'
 interface Props {
   error?: any
   onChange: any
-  value: any
+  value: string
 }
 
 dayjs.extend(utc)
 
 const DateTimePickerV2: FC<Props> = ({ error, onChange, value }: Props): JSX.Element => {
+  const defaultValue = value === '' ? 'DD/MM/YYYY HH:mm' : value
   return (
     <div className='flex flex-col gap-1'>
       <DateTimePicker
@@ -27,7 +28,7 @@ const DateTimePickerV2: FC<Props> = ({ error, onChange, value }: Props): JSX.Ele
           borderRadius: '8px',
         }}
         format='DD/MM/YYYY HH:mm'
-        value={value === '' ? dayjs.utc() : dayjs.utc(value)}
+        value={dayjs.utc(defaultValue)}
         onChange={onChange}
       />
       {!!error && <span className='text-red-600 text-sm'>{error?.message}</span>}

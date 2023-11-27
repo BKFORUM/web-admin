@@ -1,5 +1,5 @@
 import { persist, action, Action, Thunk, thunk } from "easy-peasy";
-import { deletePost, getAllCommentPost, getAllPost, getPostById } from "../../services/post.service";
+import { deletePost, getAllCommentPost, getAllPost, getPostById, postImage } from "../../services/post.service";
 import { IParams } from "@interfaces/IParameter";
 
 export interface IPostModel {
@@ -26,6 +26,11 @@ export interface IPostModel {
     isGetPostByIdSuccess: boolean;
     setIsGetPostByIdSuccess: Action<IPostModel, boolean>;
     getPostById: Thunk<IPostModel, string>;
+
+    //PostImage
+    isPostImageSuccess: boolean;
+    setIsPostImageSuccess: Action<IPostModel, boolean>;
+    postImage: Thunk<IPostModel, any>;
 }
 
 export const postModel: IPostModel = persist({
@@ -99,6 +104,24 @@ export const postModel: IPostModel = persist({
             })
             .catch((error) => {
                 actions.setIsGetPostByIdSuccess(false)
+                actions.setMessageErrorPost(error?.response?.data?.message)
+            });
+    }),
+
+    //PostImage
+    isPostImageSuccess: true,
+    setIsPostImageSuccess: action((state, payload) => {
+        state.isPostImageSuccess = payload;
+    }),
+    postImage: thunk(async (actions, payload) => {
+        return postImage(payload)
+            .then(async (res) => {
+                actions.setIsPostImageSuccess(true)
+                return res.data;
+            })
+            .catch((error) => {
+                console.log(error)
+                actions.setIsPostImageSuccess(false)
                 actions.setMessageErrorPost(error?.response?.data?.message)
             });
     }),

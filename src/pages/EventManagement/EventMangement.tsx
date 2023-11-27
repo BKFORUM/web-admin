@@ -3,27 +3,11 @@ import { Box, Tab, Tabs } from '@mui/material'
 import TabPanel from '@components/TabPanel'
 import Events from './components/Events'
 import EventsForum from './components/EventsForum'
-import { GridSortModel } from '@mui/x-data-grid'
 
 interface Props {}
 
 const EventManagement: FC<Props> = (): JSX.Element => {
   const [value, setValue] = useState(0)
-  const [inputSearch, setInputSearch] = useState<string>('')
-  const [rowsData, setRows] = useState<any[]>([])
-  const [rowTotal, setRowTotal] = useState(0)
-  const [paginationModel, setPaginationModel] = useState({
-    page: 0,
-    pageSize: 10,
-  })
-
-  const [sortModel, setSortModel] = useState<GridSortModel>([
-    {
-      field: 'name',
-      sort: 'asc',
-    },
-  ])
-
   const a11yProps = (index: number) => {
     return {
       id: `simple-tab-${index}`,

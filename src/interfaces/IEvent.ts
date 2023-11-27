@@ -1,9 +1,9 @@
 export interface IEvent {
     id?: string
-    name: string
+    displayName: string
     location: string
-    startTime: string
-    endTime: string
+    startAt: string
+    endAt: string
     interested?: number
     status?: string
     description: string

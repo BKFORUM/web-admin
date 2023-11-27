@@ -1,6 +1,6 @@
 import { Tooltip } from '@mui/material'
 import { GridRenderCellParams, GridSortModel } from '@mui/x-data-grid'
-import { FC, useCallback, useState } from 'react'
+import { FC, useCallback, useEffect, useState } from 'react'
 import AddIcon from '@mui/icons-material/Add'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
@@ -10,13 +10,35 @@ import SearchInput from '@components/SearchInput'
 import Table from '@components/Table'
 import { IEvent } from '@interfaces/IEvent'
 import ModalAddEdit from '@components/ModalAddEdit'
-import { formatDateTimeLocal } from '@utils/functions/formatDay'
+import { formatDateLocalV2, formatDateTimeLocal } from '@utils/functions/formatDay'
+import { useStoreActions, useStoreState } from 'easy-peasy'
+import {
+  eventActionSelector,
+  eventStateSelector,
+  notifyActionSelector,
+  postActionSelector,
+} from '@store/index'
+import ModalConfirm from '@components/ModalConfirm'
 
 interface Props {}
 
 const Events: FC<Props> = (): JSX.Element => {
+  const { setNotifySetting } = useStoreActions(notifyActionSelector)
+  const { postImage } = useStoreActions(postActionSelector)
+  const {
+    addEvent,
+    getAllEvent,
+    setIsAddEventSuccess,
+    setIsGetAllEventSuccess,
+    setIsDeleteEventSuccess,
+    deleteEvent,
+  } = useStoreActions(eventActionSelector)
+  const { isGetAllEventSuccess, messageError, isAddEventSuccess, isDeleteEventSuccess } =
+    useStoreState(eventStateSelector)
+
   const [inputSearch, setInputSearch] = useState<string>('')
   const [openModalAddEdit, setOpenModalAddEdit] = useState(false)
+  const [openModalDelete, setOpenModalDelete] = useState(false)
   const [rowsData, setRows] = useState<IEvent[]>([])
   const [rowTotal, setRowTotal] = useState(0)
   const [paginationModel, setPaginationModel] = useState({
@@ -26,10 +48,66 @@ const Events: FC<Props> = (): JSX.Element => {
   const [loading, setLoading] = useState<boolean>(false)
   const [sortModel, setSortModel] = useState<GridSortModel>([
     {
-      field: 'name',
+      field: 'startAt',
       sort: 'asc',
     },
   ])
+  const [rowSelected, setRowSelected] = useState<IEvent | undefined>(undefined)
+
+  const getAllEventGeneral = async (): Promise<void> => {
+    setLoading(true)
+    const res = await getAllEvent({
+      search: inputSearch,
+      skip: paginationModel.page * 10,
+      take: paginationModel.pageSize,
+      order: `${sortModel[0]?.field}:${sortModel[0]?.sort}`,
+      // status: 'GENERAL',
+    })
+    if (res) {
+      setRowTotal(res?.totalRecords)
+      const data = res?.data?.map((item: any, index: number) => ({
+        ...item,
+        tag: paginationModel.page * paginationModel.pageSize + index + 1,
+      }))
+      setRows(data)
+      setLoading(false)
+    } else {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    //  addQueryParam(inputSearch)
+    getAllEventGeneral()
+  }, [sortModel, paginationModel])
+
+  useEffect(() => {
+    if (!isGetAllEventSuccess) {
+      setNotifySetting({ show: true, status: 'error', message: messageError })
+      setIsGetAllEventSuccess(true)
+    }
+  }, [isGetAllEventSuccess])
+
+  useEffect(() => {
+    if (!isAddEventSuccess) {
+      setNotifySetting({ show: true, status: 'error', message: messageError })
+      setIsAddEventSuccess(true)
+    }
+  }, [isAddEventSuccess])
+
+  // useEffect(() => {
+  //   if (!isEditForumSuccess) {
+  //     setNotifySetting({ show: true, status: 'error', message: messageErrorForum })
+  //     setIsEditForumSuccess(true)
+  //   }
+  // }, [isEditForumSuccess])
+
+  useEffect(() => {
+    if (!isDeleteEventSuccess) {
+      setNotifySetting({ show: true, status: 'error', message: messageError })
+      setIsDeleteEventSuccess(true)
+    }
+  }, [isDeleteEventSuccess])
 
   const handleSortModelChange = useCallback((newSortModel: GridSortModel) => {
     setSortModel(newSortModel)
@@ -40,8 +118,71 @@ const Events: FC<Props> = (): JSX.Element => {
   }
 
   const handleAction = async (data: any): Promise<void> => {
-    console.log(data)
-    console.log(formatDateTimeLocal(data?.startTime))
+    setLoading(true)
+    const { FileImages, ...dataNoDocuments } = data
+    const startAt = formatDateTimeLocal(dataNoDocuments?.startAt)
+    const endAt = formatDateTimeLocal(dataNoDocuments?.endAt)
+    const newData = { ...dataNoDocuments, startAt: startAt, endAt: endAt }
+
+    const formData = new FormData()
+    for (let i = 0; i < FileImages?.length; i++) {
+      formData.append(`documents`, FileImages[i])
+    }
+    if (rowSelected !== undefined) {
+      // const res = await editForum(data)
+      // if (res) {
+      //   setNotifySetting({
+      //     show: true,
+      //     status: 'success',
+      //     message: 'Edit forum successful',
+      //   })
+      // }
+    } else {
+      console.log(FileImages)
+      if (FileImages?.length > 0) {
+        const resImage = await postImage(formData)
+        if (resImage) {
+          const res = await addEvent({
+            ...newData,
+            documents: resImage,
+            type: 'GENERAL',
+          })
+          if (res) {
+            setNotifySetting({
+              show: true,
+              status: 'success',
+              message: 'Add events successful',
+            })
+            getAllEventGeneral()
+          }
+        }
+      } else {
+        const res = await addEvent({ ...newData, type: 'GENERAL' })
+        if (res) {
+          setNotifySetting({
+            show: true,
+            status: 'success',
+            message: 'Add events successful',
+          })
+          getAllEventGeneral()
+        }
+      }
+    }
+    setLoading(false)
+    setOpenModalAddEdit(false)
+  }
+
+  const handleDelete = async () => {
+    const res = await deleteEvent(String(rowSelected?.id))
+    if (res) {
+      setNotifySetting({
+        show: true,
+        status: 'success',
+        message: 'Delete Event successful',
+      })
+      getAllEventGeneral()
+    }
+    setOpenModalDelete(false)
   }
 
   const columnsEvents = [
@@ -59,7 +200,7 @@ const Events: FC<Props> = (): JSX.Element => {
       disableColumnMenu: true,
     },
     {
-      field: 'name',
+      field: 'displayName',
       headerName: 'Name',
       flex: 2,
       minWidth: 150,
@@ -68,8 +209,8 @@ const Events: FC<Props> = (): JSX.Element => {
       headerAlign: 'left',
       hideable: false,
       renderCell: (params: GridRenderCellParams<any, string>) => (
-        <Tooltip title={params.row.name}>
-          <p className={`text-black line-clamp-1`}>{params.row.name}</p>
+        <Tooltip title={params.row.displayName}>
+          <p className={`text-black line-clamp-1`}>{params.row.displayName}</p>
         </Tooltip>
       ),
     },
@@ -89,31 +230,35 @@ const Events: FC<Props> = (): JSX.Element => {
       ),
     },
     {
-      field: 'startTime',
+      field: 'startAt',
       headerName: 'Start Time',
       type: 'number',
       minWidth: 100,
-      flex: 1,
+      flex: 1.5,
       align: 'left',
       headerAlign: 'left',
       disableColumnMenu: true,
       hideable: false,
       renderCell: (params: GridRenderCellParams<any, number>) => (
-        <a className='text-blue-700 cursor-pointer'>{params.row.startTime}</a>
+        <Tooltip title={formatDateLocalV2(params.row.startAt)}>
+          <a className='cursor-pointer'>{formatDateLocalV2(params.row.startAt)}</a>
+        </Tooltip>
       ),
     },
     {
-      field: 'endTime',
+      field: 'endAt',
       headerName: 'End Time',
       type: 'number',
       minWidth: 100,
-      flex: 1,
+      flex: 1.5,
       align: 'left',
       headerAlign: 'left',
       disableColumnMenu: true,
       hideable: false,
       renderCell: (params: GridRenderCellParams<any, number>) => (
-        <a className='text-blue-700 cursor-pointer'>{params.row.endTime}</a>
+        <Tooltip title={formatDateLocalV2(params.row.endAt)}>
+          <a className=' cursor-pointer'>{formatDateLocalV2(params.row.endAt)}</a>
+        </Tooltip>
       ),
     },
 
@@ -127,7 +272,7 @@ const Events: FC<Props> = (): JSX.Element => {
       disableColumnMenu: true,
       hideable: false,
       renderCell: (params: GridRenderCellParams<any, number>) => (
-        <a className='text-blue-700 cursor-pointer'>{params.row.interested}</a>
+        <a className=' cursor-pointer '>{params.row.interested}</a>
       ),
     },
     {
@@ -141,13 +286,31 @@ const Events: FC<Props> = (): JSX.Element => {
       hideable: false,
       sortable: false,
       renderCell: (params: GridRenderCellParams<any, number>) => (
-        <a className='text-blue-700 cursor-pointer'>{params.row.status}</a>
+        <>
+          {params.row.status === 'UPCOMING' && (
+            <span className='px-2 py-1 bg-slate-100 rounded-3xl text-xs'>
+              {params.row.status}
+            </span>
+          )}
+
+          {params.row.status === 'DONE' && (
+            <span className='px-2 py-1 bg-gray-300 rounded-3xl text-xs'>
+              {params.row.status}
+            </span>
+          )}
+
+          {params.row.status === 'COMING' && (
+            <span className='px-2 py-1 bg-red-200 rounded-3xl text-xs'>
+              {params.row.status}
+            </span>
+          )}
+        </>
       ),
     },
     {
       field: 'action',
       headerName: 'Action',
-      maxWidth: 120,
+      // maxWidth: 130,
       minWidth: 80,
       flex: 1,
       align: 'left',
@@ -174,18 +337,23 @@ const Events: FC<Props> = (): JSX.Element => {
           <EditIcon
             sx={{ cursor: 'pointer' }}
             onClick={() => {
-              // setRowSelected({
-              //   ...params.params.row,
-              //   moderatorId: params.params.row.moderator.id,
-              // })
-              // setOpenModalEdit(true)
+              if (params.params.row.status !== 'UPCOMING') {
+                setNotifySetting({
+                  show: true,
+                  status: 'error',
+                  message: `The event whose status is ${params.params.row.status} is not edited`,
+                })
+              } else {
+                setRowSelected(params.params.row)
+                setOpenModalAddEdit(true)
+              }
             }}
           />
           <DeleteIcon
             sx={{ color: '#d32f2f', cursor: 'pointer' }}
             onClick={() => {
-              // setRowSelected(params.params.row)
-              // setOpenModalDelete(true)
+              setRowSelected(params.params.row)
+              setOpenModalDelete(true)
             }}
           />
         </div>
@@ -205,7 +373,7 @@ const Events: FC<Props> = (): JSX.Element => {
           <Button
             typeButton='blue'
             onClick={() => {
-              // setRowSelected(undefined)
+              setRowSelected(undefined)
               setOpenModalAddEdit(true)
             }}>
             <div className='flex items-center gap-2'>
@@ -228,7 +396,7 @@ const Events: FC<Props> = (): JSX.Element => {
           />
         </div>
       </div>
-      {/* {openModalDelete ? (
+      {openModalDelete ? (
         <ModalConfirm
           open={openModalDelete}
           handleClose={() => {
@@ -236,12 +404,12 @@ const Events: FC<Props> = (): JSX.Element => {
           }}
           handleDelete={handleDelete}
         />
-      ) : null} */}
+      ) : null}
       {openModalAddEdit ? (
         <ModalAddEdit
           loading={loading}
           open={openModalAddEdit}
-          rowSelected={undefined}
+          rowSelected={rowSelected}
           handleClose={() => setOpenModalAddEdit(false)}
           handleAction={handleAction}
           page='EVENTS'

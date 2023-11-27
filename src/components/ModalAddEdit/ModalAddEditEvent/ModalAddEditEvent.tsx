@@ -25,9 +25,9 @@ interface Image {
 }
 
 const schema = yup.object().shape({
-  name: yup.string().required('Name is valid!'),
+  displayName: yup.string().required('Name is valid!'),
   location: yup.string().required('Location of birth is valid!'),
-  startTime: yup
+  startAt: yup
     .string()
     .required('Start Time is required!')
     .test({
@@ -35,11 +35,19 @@ const schema = yup.object().shape({
       exclusive: true,
       message: 'Start Time must be less than End Time',
       test: function (value) {
-        const { endTime } = this.parent
-        return !endTime || new Date(value) < new Date(endTime)
+        const { endAt } = this.parent
+        return !endAt || new Date(value) < new Date(endAt)
+      },
+    })
+    .test({
+      name: 'start-time-future-check',
+      message: 'Start Time must be in the future',
+      test: function (value) {
+        const currentTime = new Date()
+        return new Date(value) > currentTime
       },
     }),
-  endTime: yup
+  endAt: yup
     .string()
     .required('End Time is required!')
     .test({
@@ -47,11 +55,11 @@ const schema = yup.object().shape({
       exclusive: true,
       message: 'End Time must be greater than Start Time',
       test: function (value) {
-        const { startTime } = this.parent
-        return !startTime || new Date(value) > new Date(startTime)
+        const { startAt } = this.parent
+        return !startAt || new Date(value) > new Date(startAt)
       },
     }),
-  description: yup.string().required('Description is valid!'),
+  content: yup.string().required('Description is valid!'),
 })
 
 const ModalAddEditEvent: FC<Props<IEvent>> = ({
@@ -68,11 +76,11 @@ const ModalAddEditEvent: FC<Props<IEvent>> = ({
 
   const defaultValues: IEvent = {
     id: rowSelected?.id || '',
-    name: rowSelected?.name || '',
+    displayName: rowSelected?.displayName || '',
     location: rowSelected?.location || '',
-    startTime: rowSelected?.startTime || '',
-    endTime: rowSelected?.endTime || '',
-    description: rowSelected?.description || '',
+    startAt: rowSelected?.startAt || '',
+    endAt: rowSelected?.endAt || '',
+    content: rowSelected?.content || '',
   }
 
   const { handleSubmit, control, setValue, watch, clearErrors } = useForm<IEvent>({
@@ -81,16 +89,16 @@ const ModalAddEditEvent: FC<Props<IEvent>> = ({
   })
 
   const onSubmit = async (data: IEvent) => {
-    handleAction(data)
+    handleAction({ ...data, FileImages })
   }
 
   const onEditorStateChange = (editorState: EditorState) => {
     setEditorState(editorState)
     if (editorState.getCurrentContent().hasText()) {
       const dataHTML = draftToHtml(convertToRaw(editorState.getCurrentContent()))
-      setValue('description', dataHTML)
+      setValue('content', dataHTML)
     } else {
-      setValue('description', '')
+      setValue('content', '')
     }
   }
 
@@ -124,11 +132,11 @@ const ModalAddEditEvent: FC<Props<IEvent>> = ({
     setImages(newImagePreview)
   }
 
-  const descriptionValue = watch('description')
+  const descriptionValue = watch('content')
 
   useEffect(() => {
     if (descriptionValue !== '') {
-      clearErrors('description')
+      clearErrors('content')
     }
   }, [editorState])
 
@@ -155,7 +163,7 @@ const ModalAddEditEvent: FC<Props<IEvent>> = ({
               Name <span className='text-red-600'>*</span>
             </label>
             <TextFieldV2
-              name='name'
+              name='displayName'
               control={control}
               // placeholder='name'
             />
@@ -169,7 +177,7 @@ const ModalAddEditEvent: FC<Props<IEvent>> = ({
                 Start time <span className='text-red-600'>*</span>
               </label>
               <Controller
-                name='startTime'
+                name='startAt'
                 control={control}
                 render={({ field: { onChange, value }, fieldState: { error } }) => (
                   <DateTimePickerV2
@@ -188,7 +196,7 @@ const ModalAddEditEvent: FC<Props<IEvent>> = ({
                 Start time <span className='text-red-600'>*</span>
               </label>
               <Controller
-                name='endTime'
+                name='endAt'
                 control={control}
                 render={({ field: { onChange, value }, fieldState: { error } }) => (
                   <DateTimePickerV2
@@ -223,7 +231,7 @@ const ModalAddEditEvent: FC<Props<IEvent>> = ({
             </label>
 
             <Controller
-              name='description'
+              name='content'
               control={control}
               render={({ field: {}, fieldState: { error } }) => (
                 <RichTextEditTor
