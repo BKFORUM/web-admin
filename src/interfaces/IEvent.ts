@@ -1,3 +1,5 @@
+import { IDocuments } from "./IPost"
+
 export interface IEvent {
     id?: string
     displayName: string
@@ -6,6 +8,6 @@ export interface IEvent {
     endAt: string
     interested?: number
     status?: string
-    description: string
-    documents?: string[]
+    content: string
+    documents?: IDocuments[]
 }

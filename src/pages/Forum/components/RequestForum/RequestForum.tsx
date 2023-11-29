@@ -95,11 +95,13 @@ function ActionsMenu({ params, isUpdate }: IActionMenu) {
         <div className={`lg:flex gap-2 xs:hidden`}>
           <Button
             loading={loading}
+            onClick={handleApproveClick}
             typeButton='approve'>
             Approve
           </Button>
           <Button
             loading={loading}
+            onClick={handleRejectClick}
             typeButton='reject'>
             Reject
           </Button>

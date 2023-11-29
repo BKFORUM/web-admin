@@ -19,10 +19,14 @@ import {
   postActionSelector,
 } from '@store/index'
 import ModalConfirm from '@components/ModalConfirm'
+import ModalDetailEvent from '@components/ModalDetailEvent'
+import { useDebounce } from '@hooks/useDebounce'
 
 interface Props {}
 
 const Events: FC<Props> = (): JSX.Element => {
+  const searchParams = new URLSearchParams(window.location.search)
+  const search = searchParams.get('search')
   const { setNotifySetting } = useStoreActions(notifyActionSelector)
   const { postImage } = useStoreActions(postActionSelector)
   const {
@@ -31,14 +35,23 @@ const Events: FC<Props> = (): JSX.Element => {
     setIsAddEventSuccess,
     setIsGetAllEventSuccess,
     setIsDeleteEventSuccess,
+    setIsEditEventSuccess,
     deleteEvent,
+    editEvent,
   } = useStoreActions(eventActionSelector)
-  const { isGetAllEventSuccess, messageError, isAddEventSuccess, isDeleteEventSuccess } =
-    useStoreState(eventStateSelector)
+  const {
+    isGetAllEventSuccess,
+    messageError,
+    isAddEventSuccess,
+    isDeleteEventSuccess,
+    isEditEventSuccess,
+  } = useStoreState(eventStateSelector)
 
-  const [inputSearch, setInputSearch] = useState<string>('')
+  const [inputSearch, setInputSearch] = useState<string>(search !== null ? search : '')
   const [openModalAddEdit, setOpenModalAddEdit] = useState(false)
   const [openModalDelete, setOpenModalDelete] = useState(false)
+  const [openModalDetailEvent, setOpenModalDetailEvent] = useState(false)
+
   const [rowsData, setRows] = useState<IEvent[]>([])
   const [rowTotal, setRowTotal] = useState(0)
   const [paginationModel, setPaginationModel] = useState({
@@ -54,6 +67,15 @@ const Events: FC<Props> = (): JSX.Element => {
   ])
   const [rowSelected, setRowSelected] = useState<IEvent | undefined>(undefined)
 
+  const debouncedInputValue = useDebounce(inputSearch, 500)
+
+  const addQueryParam = (valueSearch: string): void => {
+    const queryParams = new URLSearchParams()
+    queryParams.set('search', valueSearch.trim())
+    const newURL = `/event-management?${queryParams.toString()}`
+    window.history.pushState({}, '', newURL)
+  }
+
   const getAllEventGeneral = async (): Promise<void> => {
     setLoading(true)
     const res = await getAllEvent({
@@ -61,7 +83,6 @@ const Events: FC<Props> = (): JSX.Element => {
       skip: paginationModel.page * 10,
       take: paginationModel.pageSize,
       order: `${sortModel[0]?.field}:${sortModel[0]?.sort}`,
-      // status: 'GENERAL',
     })
     if (res) {
       setRowTotal(res?.totalRecords)
@@ -77,9 +98,9 @@ const Events: FC<Props> = (): JSX.Element => {
   }
 
   useEffect(() => {
-    //  addQueryParam(inputSearch)
+    addQueryParam(inputSearch)
     getAllEventGeneral()
-  }, [sortModel, paginationModel])
+  }, [sortModel, paginationModel, debouncedInputValue])
 
   useEffect(() => {
     if (!isGetAllEventSuccess) {
@@ -95,12 +116,12 @@ const Events: FC<Props> = (): JSX.Element => {
     }
   }, [isAddEventSuccess])
 
-  // useEffect(() => {
-  //   if (!isEditForumSuccess) {
-  //     setNotifySetting({ show: true, status: 'error', message: messageErrorForum })
-  //     setIsEditForumSuccess(true)
-  //   }
-  // }, [isEditForumSuccess])
+  useEffect(() => {
+    if (!isEditEventSuccess) {
+      setNotifySetting({ show: true, status: 'error', message: messageError })
+      setIsEditEventSuccess(true)
+    }
+  }, [isEditEventSuccess])
 
   useEffect(() => {
     if (!isDeleteEventSuccess) {
@@ -128,22 +149,50 @@ const Events: FC<Props> = (): JSX.Element => {
     for (let i = 0; i < FileImages?.length; i++) {
       formData.append(`documents`, FileImages[i])
     }
+    const newUrls = data?.imageEdit.map((image: any) => {
+      return { fileUrl: image.fileUrl, fileName: image.fileName }
+    })
+
     if (rowSelected !== undefined) {
-      // const res = await editForum(data)
-      // if (res) {
-      //   setNotifySetting({
-      //     show: true,
-      //     status: 'success',
-      //     message: 'Edit forum successful',
-      //   })
-      // }
+      if (FileImages?.length > 0) {
+        const resImage = await postImage(formData)
+        if (resImage) {
+          const res = await editEvent({
+            ...data,
+            documents: [...newUrls, ...resImage],
+            type: 'GENERAL',
+          })
+          if (res) {
+            setNotifySetting({
+              show: true,
+              status: 'success',
+              message: 'Edit events successful',
+            })
+            getAllEventGeneral()
+          }
+        }
+      } else {
+        const res = await editEvent({
+          ...data,
+          documents: newUrls,
+          type: 'GENERAL',
+        })
+        if (res) {
+          setNotifySetting({
+            show: true,
+            status: 'success',
+            message: 'Edit events successful',
+          })
+          getAllEventGeneral()
+        }
+      }
     } else {
-      console.log(FileImages)
+      const { id, ...dataNoId } = newData
       if (FileImages?.length > 0) {
         const resImage = await postImage(formData)
         if (resImage) {
           const res = await addEvent({
-            ...newData,
+            ...dataNoId,
             documents: resImage,
             type: 'GENERAL',
           })
@@ -157,7 +206,7 @@ const Events: FC<Props> = (): JSX.Element => {
           }
         }
       } else {
-        const res = await addEvent({ ...newData, type: 'GENERAL' })
+        const res = await addEvent({ ...dataNoId, type: 'GENERAL' })
         if (res) {
           setNotifySetting({
             show: true,
@@ -204,6 +253,7 @@ const Events: FC<Props> = (): JSX.Element => {
       headerName: 'Name',
       flex: 2,
       minWidth: 150,
+      sortable: false,
       editable: false,
       align: 'left',
       headerAlign: 'left',
@@ -218,6 +268,7 @@ const Events: FC<Props> = (): JSX.Element => {
       field: 'location',
       headerName: 'Location',
       type: 'string',
+      sortable: false,
       flex: 2,
       minWidth: 150,
       align: 'left',
@@ -254,6 +305,7 @@ const Events: FC<Props> = (): JSX.Element => {
       align: 'left',
       headerAlign: 'left',
       disableColumnMenu: true,
+      sortable: false,
       hideable: false,
       renderCell: (params: GridRenderCellParams<any, number>) => (
         <Tooltip title={formatDateLocalV2(params.row.endAt)}>
@@ -299,7 +351,7 @@ const Events: FC<Props> = (): JSX.Element => {
             </span>
           )}
 
-          {params.row.status === 'COMING' && (
+          {params.row.status === 'HAPPENING' && (
             <span className='px-2 py-1 bg-red-200 rounded-3xl text-xs'>
               {params.row.status}
             </span>
@@ -331,7 +383,8 @@ const Events: FC<Props> = (): JSX.Element => {
           <VisibilityIcon
             sx={{ cursor: 'pointer', color: '#1278ccf0' }}
             onClick={() => {
-              // navigate('/forum-management/' + params.params.row.id)
+              setRowSelected(params.params.row)
+              setOpenModalDetailEvent(true)
             }}
           />
           <EditIcon
@@ -415,6 +468,14 @@ const Events: FC<Props> = (): JSX.Element => {
           page='EVENTS'
         />
       ) : null}
+
+      {openModalDetailEvent && (
+        <ModalDetailEvent
+          item={rowSelected}
+          open={openModalDetailEvent}
+          setOpen={setOpenModalDetailEvent}
+        />
+      )}
     </>
   )
 }

@@ -43,6 +43,9 @@ export interface IComment {
     updateAt: string
     userId: string
     user: IUserDetail
+    _count?: {
+        replyComments: number
+    }
 }
 
 export interface IDocuments {
@@ -58,4 +61,24 @@ export interface IDocuments {
 export interface pageMode {
     page: number,
     pageSize: number
+}
+
+export interface IEditChild {
+    id: string
+    item: IComment
+}
+
+export interface IDataChild {
+    id: string
+    data: IComment[]
+}
+
+export interface IChildLoading {
+    id: string
+    isLoading: boolean
+}
+
+export interface ICountReply {
+    id: string
+    _count: number
 }

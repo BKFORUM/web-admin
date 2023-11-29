@@ -1,6 +1,7 @@
 import { IEvent } from "@interfaces/IEvent";
 import { persist, action, Action, Thunk, thunk } from "easy-peasy";
-import { addEvent, deleteEvent, editEvent, getAllEvent } from "../../services/event.service";
+import { addEvent, deleteEvent, editEvent, getAllCommentEventById, getAllEvent } from "../../services/event.service";
+import { IParams } from "@interfaces/IParameter";
 
 export interface IEventModel {
     //MessageError
@@ -27,7 +28,10 @@ export interface IEventModel {
     setIsDeleteEventSuccess: Action<IEventModel, boolean>;
     deleteEvent: Thunk<IEventModel, string>;
 
-
+    //getAllCommentEvent
+    isGetAllCommentEventSuccess: boolean;
+    setIsGetAllCommentEventSuccess: Action<IEventModel, boolean>;
+    getAllCommentEventById: Thunk<IEventModel, IParams>;
 }
 
 export const eventModel: IEventModel = persist({
@@ -101,6 +105,23 @@ export const eventModel: IEventModel = persist({
             })
             .catch((error) => {
                 actions.setIsDeleteEventSuccess(false)
+                actions.setMessageError(error?.response?.data?.message)
+            });
+    }),
+
+    //GetAllCommentEvent
+    isGetAllCommentEventSuccess: true,
+    setIsGetAllCommentEventSuccess: action((state, payload) => {
+        state.isGetAllCommentEventSuccess = payload;
+    }),
+    getAllCommentEventById: thunk(async (actions, payload) => {
+        return getAllCommentEventById(payload)
+            .then(async (res) => {
+                actions.setIsGetAllCommentEventSuccess(true)
+                return res.data;
+            })
+            .catch((error) => {
+                actions.setIsGetAllCommentEventSuccess(false)
                 actions.setMessageError(error?.response?.data?.message)
             });
     }),

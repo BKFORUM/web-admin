@@ -1,4 +1,5 @@
 import { IEvent } from "@interfaces/IEvent";
+import { IParams } from "@interfaces/IParameter";
 import BaseURL from "@utils/api/baseURL";
 
 const getAllEvent = (params: any) => {
@@ -33,4 +34,12 @@ const deleteEvent = (id: string) => {
     });
 };
 
-export { getAllEvent, addEvent, editEvent, deleteEvent }
+const getAllCommentEventById = ({ id, params }: IParams) => {
+    return BaseURL({
+        url: `/events/${id}/event-comments`,
+        method: "GET",
+        params,
+    });
+}
+
+export { getAllEvent, addEvent, editEvent, deleteEvent, getAllCommentEventById }

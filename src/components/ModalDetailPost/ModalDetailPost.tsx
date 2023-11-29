@@ -2,9 +2,9 @@ import Comment from '@components/ModalDetailPost/components/Comment'
 import PostContent from '@components/PostContent'
 import { Dialog, Transition } from '@headlessui/react'
 import { IComment, IPost, pageMode } from '@interfaces/IPost'
-import { postActionSelector } from '@store/index'
+import { postActionSelector, postStateSelector } from '@store/index'
 import { dayComparedToThePast } from '@utils/functions/formatDay'
-import { useStoreActions } from 'easy-peasy'
+import { useStoreActions, useStoreState } from 'easy-peasy'
 import { FC, Fragment, useEffect, useState } from 'react'
 import {
   HiOutlineHeart,
@@ -19,7 +19,9 @@ interface Props {
 }
 
 const ModalDetailPost: FC<Props> = ({ open, setOpen, item }: Props): JSX.Element => {
-  const { getAllCommentPost } = useStoreActions(postActionSelector)
+  const { getAllCommentPost, setCountReplyByCommentId } =
+    useStoreActions(postActionSelector)
+  const { countReplyByCommentId } = useStoreState(postStateSelector)
   const [loading, setIsLoading] = useState<boolean>(false)
   const [totalRowCount, setTotalRowCount] = useState<number>(0)
   const [paginationModel, setPaginationModel] = useState<pageMode | null>(null)
@@ -39,6 +41,11 @@ const ModalDetailPost: FC<Props> = ({ open, setOpen, item }: Props): JSX.Element
       if (res) {
         setTotalRowCount(res.totalRecords)
         setData([...data, ...res.data])
+
+        const countsReply = res.data.map((item: IComment) => {
+          return { id: item.id, _count: item._count?.replyComments }
+        })
+        setCountReplyByCommentId([...countReplyByCommentId, ...countsReply])
       }
       setIsLoading(false)
     }

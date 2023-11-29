@@ -41,5 +41,14 @@ const postImage = (data: any) => {
 }
 
 
+const getAllReplyByCommentId = ({ id, params }: IParams) => {
+    return BaseURL({
+        url: `/comments/${id}/replies`,
+        method: "GET",
+        params,
+    });
+}
 
-export { getAllPost, deletePost, getAllCommentPost, getPostById, postImage }
+
+
+export { getAllPost, deletePost, getAllCommentPost, getPostById, postImage, getAllReplyByCommentId }

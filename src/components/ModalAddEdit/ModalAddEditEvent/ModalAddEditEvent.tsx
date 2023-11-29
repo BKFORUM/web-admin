@@ -7,10 +7,11 @@ import FooterModal from '../FooterModal'
 import TextFieldV2 from '@components/TextFieldV2'
 import DateTimePickerV2 from '@components/DateTimePickerV2'
 import RichTextEditTor from '@components/RichTextEditor'
-import { EditorState, convertToRaw } from 'draft-js'
+import { EditorState, convertToRaw, ContentState } from 'draft-js'
 import draftToHtml from 'draftjs-to-html'
 import MultiImage from '@components/MultiImage'
-// import { IDocuments } from '@interfaces/IPost'
+import { IDocuments } from '@interfaces/IPost'
+import htmlToDraft from 'html-to-draftjs'
 
 interface Props<T> {
   handleAction: (data: any) => Promise<void>
@@ -71,7 +72,7 @@ const ModalAddEditEvent: FC<Props<IEvent>> = ({
   const ImageRef: any = useRef()
   const [Images, setImages] = useState<Image[]>([])
   const [FileImages, setFileImages] = useState<File[]>([])
-  // const [imageEdit, setImageEdit] = useState<IDocuments[]>([])
+  const [imageEdit, setImageEdit] = useState<IDocuments[]>([])
   const [editorState, setEditorState] = useState(EditorState.createEmpty())
 
   const defaultValues: IEvent = {
@@ -89,7 +90,7 @@ const ModalAddEditEvent: FC<Props<IEvent>> = ({
   })
 
   const onSubmit = async (data: IEvent) => {
-    handleAction({ ...data, FileImages })
+    handleAction({ ...data, FileImages: FileImages, imageEdit: imageEdit })
   }
 
   const onEditorStateChange = (editorState: EditorState) => {
@@ -109,10 +110,10 @@ const ModalAddEditEvent: FC<Props<IEvent>> = ({
       (file: any) => file.name.split('.')[0] !== image.name,
     )
     setFileImages(newFileImages)
-    // if (rowSelected) {
-    //   const newImageEdit = imageEdit.filter((file: any) => file.fileName !== image.name)
-    //   setImageEdit(newImageEdit)
-    // }
+    if (rowSelected) {
+      const newImageEdit = imageEdit.filter((file: any) => file.fileName !== image.name)
+      setImageEdit(newImageEdit)
+    }
   }
 
   const handleFileChange = (file: any) => {
@@ -139,6 +140,27 @@ const ModalAddEditEvent: FC<Props<IEvent>> = ({
       clearErrors('content')
     }
   }, [editorState])
+
+  useEffect(() => {
+    if (rowSelected) {
+      const contentBlock = htmlToDraft(rowSelected.content)
+      const { contentBlocks, entityMap } = contentBlock
+      const contentState = ContentState.createFromBlockArray(contentBlocks, entityMap)
+      const newEditorState = EditorState.createWithContent(contentState)
+      setTimeout(() => {
+        setEditorState(newEditorState)
+      }, 50)
+      if (rowSelected.documents !== undefined) {
+        const image = rowSelected.documents.map((item) => {
+          return { fileUrl: item.fileUrl, name: item.fileName }
+        })
+        setImageEdit(rowSelected.documents)
+        if (image.length > 0) {
+          setImages(image)
+        }
+      }
+    }
+  }, [rowSelected])
 
   return (
     <div className='flex flex-col gap-2 min-w-[500px] relative'>
@@ -218,7 +240,6 @@ const ModalAddEditEvent: FC<Props<IEvent>> = ({
             <TextFieldV2
               name='location'
               control={control}
-              disabled={rowSelected !== undefined ? true : false}
               // placeholder='name'
             />
           </div>

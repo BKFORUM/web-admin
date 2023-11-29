@@ -1,6 +1,7 @@
 import { persist, action, Action, Thunk, thunk } from "easy-peasy";
-import { deletePost, getAllCommentPost, getAllPost, getPostById, postImage } from "../../services/post.service";
+import { deletePost, getAllCommentPost, getAllPost, getAllReplyByCommentId, getPostById, postImage } from "../../services/post.service";
 import { IParams } from "@interfaces/IParameter";
+import { ICountReply } from "@interfaces/IPost";
 
 export interface IPostModel {
     //MessageError
@@ -31,6 +32,13 @@ export interface IPostModel {
     isPostImageSuccess: boolean;
     setIsPostImageSuccess: Action<IPostModel, boolean>;
     postImage: Thunk<IPostModel, any>;
+
+    //getAllReplyByCommentId
+    isGetAllReplyByCommentIdSuccess: boolean;
+    setIsGetAllReplyByCommentIdSuccess: Action<IPostModel, boolean>;
+    countReplyByCommentId: ICountReply[];
+    setCountReplyByCommentId: Action<IPostModel, ICountReply[]>;
+    getAllReplyByCommentId: Thunk<IPostModel, IParams>;
 }
 
 export const postModel: IPostModel = persist({
@@ -126,4 +134,24 @@ export const postModel: IPostModel = persist({
             });
     }),
 
+    //GetAllReplyByCommentId
+    isGetAllReplyByCommentIdSuccess: true,
+    setIsGetAllReplyByCommentIdSuccess: action((state, payload) => {
+        state.isGetAllReplyByCommentIdSuccess = payload;
+    }),
+    countReplyByCommentId: [],
+    setCountReplyByCommentId: action((state, payload) => {
+        state.countReplyByCommentId = payload;
+    }),
+    getAllReplyByCommentId: thunk(async (actions, payload,) => {
+        return getAllReplyByCommentId(payload)
+            .then(async (res) => {
+                actions.setIsGetAllReplyByCommentIdSuccess(true)
+                return res.data;
+            })
+            .catch((error) => {
+                actions.setIsGetAllReplyByCommentIdSuccess(false)
+                actions.setMessageErrorPost(error?.response?.data?.message)
+            });
+    }),
 })
