@@ -54,7 +54,7 @@ export interface IForumModel {
     setIsGetAllTopicSuccess: Action<IForumModel, boolean>
     getAllTopic: Thunk<IForumModel, undefined>;
 
-    getAllEventForum: Thunk<IForumModel, any>
+    // getAllEventForum: Thunk<IForumModel, any>
 
 }
 
@@ -228,11 +228,11 @@ export const forumModel: IForumModel = persist({
     }),
 
     //getAllEventForum
-    getAllEventForum: thunk(async (actions, payload) => {
-        return getAllEventForum(payload).then(async (res) => {
-            return res.data;
-        }).catch((error) => {
-            actions.setMessageErrorForum(error?.response?.data?.message)
-        });
-    })
+    // getAllEventForum: thunk(async (actions, payload) => {
+    //     return getAllEventForum(payload).then(async (res) => {
+    //         return res.data;
+    //     }).catch((error) => {
+    //         actions.setMessageErrorForum(error?.response?.data?.message)
+    //     });
+    // })
 })
