@@ -232,7 +232,7 @@ const ForumTab: FC<Props> = (): JSX.Element => {
       headerAlign: 'left',
       hideable: false,
       renderCell: (params: GridRenderCellParams<any, number>) => (
-        <a className='text-blue-700 cursor-pointer'>{params.row._count.users}</a>
+        <a className=''>{params.row._count.users}</a>
       ),
     },
     {
@@ -246,7 +246,7 @@ const ForumTab: FC<Props> = (): JSX.Element => {
       disableColumnMenu: true,
       hideable: false,
       renderCell: (params: GridRenderCellParams<any, number>) => (
-        <a className='text-blue-700 cursor-pointer'>{params.row.event}</a>
+        <a className=''>{params.row._count.events}</a>
       ),
     },
     {

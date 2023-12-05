@@ -1,5 +1,5 @@
 import { persist, action, Action, Thunk, thunk } from "easy-peasy";
-import { addForum, addUserToForum, deleteForum, deleteUserFromForum, editForum, getAllForum, getAllTopic, getForumById, updateStatusForum } from "../../services/forum.service";
+import { addForum, addUserToForum, deleteForum, deleteUserFromForum, editForum, getAllEventForum, getAllForum, getAllTopic, getForumById, updateStatusForum } from "../../services/forum.service";
 import { IFormDataForum, IForumDetail, IListUserRequest, IRequestForumData } from "@interfaces/IForum";
 
 export interface IForumModel {
@@ -53,6 +53,8 @@ export interface IForumModel {
     isGetAllTopicSuccess: boolean
     setIsGetAllTopicSuccess: Action<IForumModel, boolean>
     getAllTopic: Thunk<IForumModel, undefined>;
+
+    getAllEventForum: Thunk<IForumModel, any>
 
 }
 
@@ -224,4 +226,13 @@ export const forumModel: IForumModel = persist({
                 actions.setMessageErrorForum(error?.response?.data?.message)
             });
     }),
+
+    //getAllEventForum
+    getAllEventForum: thunk(async (actions, payload) => {
+        return getAllEventForum(payload).then(async (res) => {
+            return res.data;
+        }).catch((error) => {
+            actions.setMessageErrorForum(error?.response?.data?.message)
+        });
+    })
 })

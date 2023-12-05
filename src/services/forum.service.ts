@@ -1,3 +1,4 @@
+import { IParams } from './../interfaces/IParameter';
 import { IFormDataForum, IListUserRequest, IRequestForumData } from "@interfaces/IForum";
 import BaseURL from "@utils/api/baseURL";
 
@@ -70,4 +71,12 @@ const deleteUserFromForum = (data: any) => {
     });
 }
 
-export { getAllForum, addForum, addUserToForum, getAllTopic, editForum, deleteForum, getForumById, updateStatusForum, deleteUserFromForum }
+const getAllEventForum = (params: any) => {
+    return BaseURL({
+        url: `/events/`,
+        method: "GET",
+        params,
+    });
+}
+
+export { getAllForum, addForum, addUserToForum, getAllTopic, editForum, deleteForum, getForumById, updateStatusForum, deleteUserFromForum, getAllEventForum }

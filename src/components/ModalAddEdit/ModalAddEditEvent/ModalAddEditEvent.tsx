@@ -8,10 +8,10 @@ import TextFieldV2 from '@components/TextFieldV2'
 import DateTimePickerV2 from '@components/DateTimePickerV2'
 import RichTextEditTor from '@components/RichTextEditor'
 import { EditorState, convertToRaw, ContentState } from 'draft-js'
+import htmlToDraft from 'html-to-draftjs'
 import draftToHtml from 'draftjs-to-html'
 import MultiImage from '@components/MultiImage'
 import { IDocuments } from '@interfaces/IPost'
-import htmlToDraft from 'html-to-draftjs'
 
 interface Props<T> {
   handleAction: (data: any) => Promise<void>

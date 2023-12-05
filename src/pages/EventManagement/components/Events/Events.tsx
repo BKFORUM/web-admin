@@ -83,6 +83,7 @@ const Events: FC<Props> = (): JSX.Element => {
       skip: paginationModel.page * 10,
       take: paginationModel.pageSize,
       order: `${sortModel[0]?.field}:${sortModel[0]?.sort}`,
+      type: 'GENERAL',
     })
     if (res) {
       setRowTotal(res?.totalRecords)
@@ -324,7 +325,7 @@ const Events: FC<Props> = (): JSX.Element => {
       disableColumnMenu: true,
       hideable: false,
       renderCell: (params: GridRenderCellParams<any, number>) => (
-        <a className=' cursor-pointer '>{params.row.interested}</a>
+        <a className=' cursor-pointer '>{params.row._count.users}</a>
       ),
     },
     {

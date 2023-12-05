@@ -6,7 +6,10 @@ export interface IEvent {
     location: string
     startAt: string
     endAt: string
-    interested?: number
+    _count?: {
+        comment: number,
+        users: number,
+    }
     status?: string
     content: string
     documents?: IDocuments[]
