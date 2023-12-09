@@ -207,7 +207,7 @@ const EventsForum: FC<Props> = (): JSX.Element => {
       disableColumnMenu: true,
       hideable: false,
       renderCell: (params: GridRenderCellParams<any, number>) => (
-        <a className=' cursor-pointer '>{params.row.interested}</a>
+        <a className=' cursor-pointer '>{params.row._count.users}</a>
       ),
     },
     {

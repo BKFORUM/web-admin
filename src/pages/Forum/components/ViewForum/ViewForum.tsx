@@ -90,7 +90,7 @@ const ViewForum: FC<Props> = (): JSX.Element => {
               />
               Forum: <span className='ml-4  text-[#3E9FDA]'>{forumDetail?.name}</span>
             </h2>
-            <div className='my-8 grid xs:grid-cols-2 md:grid-cols-4 gap-4'>
+            <div className='my-8 grid xs:grid-cols-2 md:grid-cols-3 gap-4'>
               <div
                 onClick={() => setTab('members')}
                 className={`mx-auto flex flex-col justify-center w-[100px] shrink-1 items-center border border-[#3E9FDA] px-4 p-1 rounded-2xl cursor-pointer ${
@@ -126,11 +126,11 @@ const ViewForum: FC<Props> = (): JSX.Element => {
                   className={`text-lg text-[#3E9FDA] font-bold ${
                     tab === 'events' && 'text-white'
                   }`}>
-                  24
+                  2
                 </span>
                 <span className={`${tab === 'events' && 'text-white'}`}>Events</span>
               </div>
-              <div
+              {/* <div
                 onClick={() => setTab('moderator')}
                 className={`mx-auto flex flex-col justify-center w-[100px] shrink-1 items-center border border-[#3E9FDA] px-4 p-1 rounded-2xl cursor-pointer ${
                   tab === 'moderator' && 'border-none bg-[#3E9FDA]'
@@ -144,14 +144,14 @@ const ViewForum: FC<Props> = (): JSX.Element => {
                 <span className={`${tab === 'moderator' && 'text-white'}`}>
                   Moderator
                 </span>
-              </div>
+              </div> */}
             </div>
 
             <div className=' w-full overflow-x-hidden'>
               {tab === 'members' && <ForumUserDetail />}
               {tab === 'posts' && <ForumPostDetail />}
               {tab === 'events' && <ForumEventDetail />}
-              {tab === 'moderator' && <span>Moderator</span>}
+              {/* {tab === 'moderator' && <span>Moderator</span>} */}
             </div>
           </div>
           <div className='mt-auto  flex'>

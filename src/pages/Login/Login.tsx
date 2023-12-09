@@ -160,11 +160,11 @@ const Login: FC<Props> = (): JSX.Element => {
                 </FormControl>
               )}
             />
-            <div className='flex justify-end'>
+            {/* <div className='flex justify-end'>
               <span className='text-sm cursor-pointer hover:text-blue-500'>
                 Quên mật khẩu?
               </span>
-            </div>
+            </div> */}
             <Button
               typeButton='blue'
               className='mt-10'
