@@ -1,4 +1,3 @@
-import { IParams } from './../interfaces/IParameter';
 import { IFormDataForum, IListUserRequest, IRequestForumData } from "@interfaces/IForum";
 import BaseURL from "@utils/api/baseURL";
 

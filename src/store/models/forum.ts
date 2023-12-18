@@ -1,5 +1,5 @@
 import { persist, action, Action, Thunk, thunk } from "easy-peasy";
-import { addForum, addUserToForum, deleteForum, deleteUserFromForum, editForum, getAllEventForum, getAllForum, getAllTopic, getForumById, updateStatusForum } from "../../services/forum.service";
+import { addForum, addUserToForum, deleteForum, deleteUserFromForum, editForum, getAllForum, getAllTopic, getForumById, updateStatusForum } from "../../services/forum.service";
 import { IFormDataForum, IForumDetail, IListUserRequest, IRequestForumData } from "@interfaces/IForum";
 
 export interface IForumModel {

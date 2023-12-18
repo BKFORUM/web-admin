@@ -6,10 +6,9 @@ import {
   HiOutlineMail,
   HiOutlineOfficeBuilding,
   HiOutlinePhone,
+  HiOutlineKey,
 } from 'react-icons/hi'
 import { GrUserSettings } from 'react-icons/gr'
-import { Box, Tab, Tabs } from '@mui/material'
-import TabPanel from '@components/TabPanel'
 import ForumUserItem from '../FourmUserItem'
 import ModalAddEdit from '@components/ModalAddEdit'
 import { useStoreActions, useStoreState } from 'easy-peasy'
@@ -17,6 +16,8 @@ import { notifyActionSelector, userActionSelector, userStateSelector } from '@st
 import { IUserDetail } from '@interfaces/IUser'
 import { formatDateFormDateLocal } from '@utils/functions/formatDay'
 import noData from '../../../../assets/images/notFoundSearch.jpg'
+import { Tooltip } from '@mui/material'
+import ModalConfirm from '@components/ModalConfirm'
 
 interface Props {}
 
@@ -24,22 +25,15 @@ const ViewUser: FC<Props> = (): JSX.Element => {
   const navigate = useNavigate()
   const { id } = useParams()
   const { setNotifySetting } = useStoreActions(notifyActionSelector)
-  const { getUserById, editEdit, setIsEditUserSuccess } =
+  const { getUserById, editEdit, setIsEditUserSuccess, resetPassword } =
     useStoreActions(userActionSelector)
+  const { messageErrorUser, isEditUserSuccess } = useStoreState(userStateSelector)
 
   const [statusPageDetail, setStatusPageDetail] = useState<string>('')
+  const [openModalConfirm, setOpenModalConfirm] = useState<boolean>(false)
   const [loading, setLoading] = useState<boolean>(false)
-  const { messageErrorUser, isEditUserSuccess } = useStoreState(userStateSelector)
-  const [value, setValue] = useState(0)
   const [openModalEdit, setOpenModalEdit] = useState(false)
   const [rowSelected, setRowSelected] = useState<IUserDetail>()
-
-  const a11yProps = (index: number) => {
-    return {
-      id: `simple-tab-${index}`,
-      'aria-controls': `simple-tabpanel-${index}`,
-    }
-  }
 
   const getUserByIdViewUser = async (): Promise<void> => {
     if (id) {
@@ -63,11 +57,6 @@ const ViewUser: FC<Props> = (): JSX.Element => {
     getUserByIdViewUser()
   }, [])
 
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-    console.log(event)
-    setValue(newValue)
-  }
-
   const handleAction = async (data: any): Promise<void> => {
     setLoading(true)
     const yourTime = new Date(data?.dateOfBirth)
@@ -83,31 +72,45 @@ const ViewUser: FC<Props> = (): JSX.Element => {
     }
     setLoading(false)
   }
+
+  const handleResetPassword = async (): Promise<void> => {
+    const res = await resetPassword(String(rowSelected?.id))
+    if (res) {
+      setNotifySetting({
+        show: true,
+        status: 'success',
+        message: 'Reset password successful',
+      })
+    }
+    setOpenModalConfirm(false)
+  }
+
   return (
     <>
       {statusPageDetail === 'SUCCESS' && (
         <>
-          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-            <Tabs
-              value={value}
-              onChange={handleChange}
-              aria-label='basic tabs example'>
-              <Tab
-                label='Account'
-                {...a11yProps(0)}
-              />
-              <Tab
-                label='Reset password'
-                {...a11yProps(1)}
-              />
-            </Tabs>
-          </Box>
           <div className='relative grid grid-cols-12 gap-2 h-full flex-1 mt-4 '>
-            <ArrowBackIosOutlinedIcon
-              onClick={() => navigate('/user-management')}
-              sx={{ position: 'absolute', top: 8, left: 4, cursor: 'pointer' }}
-            />
-            <div className='col-span-3 border border-gray-300 rounded-xl'>
+            <div className=' relative col-span-3 border border-gray-300 rounded-xl'>
+              <div className='absolute top-2.5 left-1.5 '>
+                <Tooltip title='Back'>
+                  <div>
+                    <ArrowBackIosOutlinedIcon
+                      onClick={() => navigate('/user-management')}
+                      className='hover:text-blue-700 cursor-pointer h-6 w-6'
+                    />
+                  </div>
+                </Tooltip>
+              </div>
+              <div className='absolute top-3 right-3 '>
+                <Tooltip title='Reset password'>
+                  <div>
+                    <HiOutlineKey
+                      onClick={() => setOpenModalConfirm(true)}
+                      className='hover:text-red-700 cursor-pointer h-6 w-6'
+                    />
+                  </div>
+                </Tooltip>
+              </div>
               <div className='flex flex-col  items-center h-full'>
                 <div className='h-36 w-36 rounded-[50%] overflow-hidden mt-6 border border-gray-200'>
                   <img
@@ -155,17 +158,7 @@ const ViewUser: FC<Props> = (): JSX.Element => {
             </div>
 
             <div className='col-span-9  border border-gray-300 rounded-xl p-4 flex flex-col  '>
-              <TabPanel
-                value={value}
-                index={0}>
-                <ForumUserItem />
-              </TabPanel>
-
-              <TabPanel
-                value={value}
-                index={1}>
-                <span>lalal</span>
-              </TabPanel>
+              <ForumUserItem />
             </div>
           </div>
 
@@ -219,6 +212,17 @@ const ViewUser: FC<Props> = (): JSX.Element => {
           </div>
         </div>
       )}
+
+      {openModalConfirm ? (
+        <ModalConfirm
+          open={openModalConfirm}
+          handleClose={() => {
+            setOpenModalConfirm(false)
+          }}
+          title='Are you sure to reset your password'
+          handleDelete={handleResetPassword}
+        />
+      ) : null}
     </>
   )
 }
