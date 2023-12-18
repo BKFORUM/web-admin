@@ -3,6 +3,7 @@ import { FC } from 'react'
 import ModalAddEditForum from './ModalAddEditForum'
 import ModalAddUserForum from './ModalAddUserForum'
 import ModalAddUser from './ModalAddUser'
+import ModalAddEditEvent from './ModalAddEditEvent'
 interface Props<T> {
   open: boolean
   handleClose: React.Dispatch<React.SetStateAction<boolean>>
@@ -60,6 +61,15 @@ const ModalAddEdit: FC<Props<any>> = ({
 
             {page === 'USER' && (
               <ModalAddUser
+                loading={loading}
+                rowSelected={rowSelected}
+                handleClose={handleClose}
+                handleAction={handleAction}
+              />
+            )}
+
+            {page === 'EVENTS' && (
+              <ModalAddEditEvent
                 loading={loading}
                 rowSelected={rowSelected}
                 handleClose={handleClose}

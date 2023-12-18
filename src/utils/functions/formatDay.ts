@@ -1,5 +1,7 @@
 import dayjs from 'dayjs';
 import 'dayjs/locale/vi';
+import utcPlugin from 'dayjs/plugin/utc';
+dayjs.extend(utcPlugin);
 
 export const formatDayVN = (dateTime: string): string => {
     var myDate = new Date(dateTime)
@@ -22,5 +24,31 @@ export const formatDateLocalV2 = (dateTime: string): string => {
     const dateObject = dayjs(dateTime);
     const formattedDate = dateObject.format('DD-MM-YYYY HH:mm');
     return formattedDate;
+}
+
+export const formatDateTimeLocal = (dateTime: string): string => {
+    const formattedTime = dayjs(dateTime).format();
+    return formattedTime;
+}
+
+export const dayComparedToThePast = (dateTime: string): string => {
+    const now = dayjs();
+    const inputDate = dayjs(dateTime);
+    const diff = now.diff(inputDate, 'minute');
+    let output: string;
+    if (diff > 3 * 24 * 60) {
+        output = inputDate.format('DD/MM/YYYY HH:mm');
+    } else if (diff > 24 * 60) {
+        const diffInDays = Math.floor(diff / (24 * 60));
+        output = `${diffInDays} ngày trước`;
+    } else if (diff > 60) {
+        const diffInHours = Math.floor(diff / 60);
+        output = `${diffInHours} giờ trước`;
+    } else if (diff < 2) {
+        output = `vừa xong`
+    } else {
+        output = `${diff} phút trước`;
+    }
+    return output;
 }
 

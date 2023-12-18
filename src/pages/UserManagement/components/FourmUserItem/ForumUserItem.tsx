@@ -63,11 +63,11 @@ const ForumUserItem: FC<Props> = (): JSX.Element => {
       </Box>
       <div
         className='mt-4 px-2 overflow-y-auto overflow-x-hidden'
-        style={{ maxHeight: 'calc(100vh - 304px)' }}>
+        style={{ maxHeight: 'calc(100vh - 260px)' }}>
         <TabPanel
           value={value}
           index={0}>
-          <div className='grid grid-cols-2 gap-5 pb-2 px-2'>
+          <div className='grid grid-cols-2 gap-5 pb-2 px-2 mt-2'>
             {dataForum.map((item, index) => {
               if (item.moderator.id === id)
                 return (
@@ -79,7 +79,7 @@ const ForumUserItem: FC<Props> = (): JSX.Element => {
                     '>
                     <div className='h-20 w-20 rounded-lg overflow-hidden'>
                       <img
-                        className='h-full w-full object-cover'
+                        className='h-full w-full object-cover border border-gray-300'
                         src={item.avatarUrl || defaultAvatar}
                         alt=''
                       />
@@ -114,7 +114,7 @@ const ForumUserItem: FC<Props> = (): JSX.Element => {
         <TabPanel
           value={value}
           index={1}>
-          <div className='grid grid-cols-2 gap-5 pb-2'>
+          <div className='grid grid-cols-2 gap-5 pb-2 mt-2'>
             {dataForum.map((item, index) => {
               if (item.moderator.id !== id)
                 return (
@@ -124,7 +124,7 @@ const ForumUserItem: FC<Props> = (): JSX.Element => {
                     className='p-2 rounded-xl flex items-start flex-1 gap-4 shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,_rgba(0,0,0,0.3)_0px_3px_7px_-3px]
                     transform hover:scale-105 duration-500 ease-in-out cursor-pointer
                     '>
-                    <div className='h-20 w-20 rounded-lg overflow-hidden'>
+                    <div className='h-20 w-20 rounded-lg overflow-hidden  border border-gray-300'>
                       <img
                         className='h-full w-full object-cover'
                         src={item.avatarUrl || defaultAvatar}

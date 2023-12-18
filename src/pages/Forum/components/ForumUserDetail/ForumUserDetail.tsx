@@ -6,6 +6,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import { IUserForum } from '@interfaces/IUser'
 import Table from '@components/Table'
 import { useStoreActions, useStoreState } from 'easy-peasy'
+import { HiOutlineCog } from 'react-icons/hi'
 import {
   forumActionSelector,
   forumStateSelector,
@@ -26,9 +27,11 @@ const ForumUserDetail: FC<Props> = (): JSX.Element => {
 
   const [loading, setLoading] = useState<boolean>(false)
   const [openModalDelete, setOpenModalDelete] = useState(false)
-  const [rowSelected, setRowSelected] = useState<string>('')
+  const [rowSelected, setRowSelected] = useState<IUserForum | null>()
 
-  const userRowsData = forumDetail?.users.map((item: { user: IUserForum }) => item.user)
+  const userRowsData = forumDetail?.users.map((item: { user: IUserForum }) =>
+    item.user.id === forumDetail.moderator.id ? { ...item.user, isMod: true } : item.user,
+  )
 
   const [sortModel, setSortModel] = useState<GridSortModel>([
     {
@@ -39,28 +42,37 @@ const ForumUserDetail: FC<Props> = (): JSX.Element => {
 
   const handleDeleteUser = async () => {
     if (id) {
-      setLoading(true)
-      const res = await deleteUserFromForum({
-        id: id,
-        userId: rowSelected,
-        status: 'DELETED',
-      })
-      if (res) {
+      console.log(rowSelected)
+      if (rowSelected?.isMod) {
         setNotifySetting({
           show: true,
-          status: 'success',
-          message: 'Delete user successful',
+          status: 'error',
+          message: 'Moderator is not delete',
         })
-        if (forumDetail !== null) {
-          const newData = forumDetail?.users.filter((item) => {
-            return item.user.id !== rowSelected
-          }) as [{ user: IUserForum }]
-          setForumDetail({ ...forumDetail, users: newData })
-          setOpenModalDelete(false)
+      } else {
+        setLoading(true)
+        const res = await deleteUserFromForum({
+          id: id,
+          userId: rowSelected?.id,
+          status: 'DELETED',
+        })
+        if (res) {
+          setNotifySetting({
+            show: true,
+            status: 'success',
+            message: 'Delete user successful',
+          })
+          if (forumDetail !== null) {
+            const newData = forumDetail?.users.filter((item) => {
+              return item.user.id !== rowSelected?.id
+            }) as [{ user: IUserForum }]
+            setForumDetail({ ...forumDetail, users: newData })
+          }
+          setLoading(false)
         }
-        setLoading(false)
       }
     }
+    setOpenModalDelete(false)
   }
 
   useEffect(() => {
@@ -86,7 +98,12 @@ const ForumUserDetail: FC<Props> = (): JSX.Element => {
       hideable: false,
       renderCell: (params: GridRenderCellParams<any, string>) => (
         <Tooltip title={params.row.fullName}>
-          <p className={`text-black line-clamp-1`}>{params.row.fullName}</p>
+          <p className={`text-black line-clamp-1`}>
+            {params.row.fullName}{' '}
+            {params.row?.isMod && (
+              <HiOutlineCog className='inline ml-1.5 mb-0.5 text-blue-800' />
+            )}
+          </p>
         </Tooltip>
       ),
     },
@@ -150,7 +167,7 @@ const ForumUserDetail: FC<Props> = (): JSX.Element => {
         <DeleteIcon
           sx={{ color: '#d32f2f', cursor: 'pointer' }}
           onClick={() => {
-            setRowSelected(params.row.id)
+            setRowSelected(params.row)
             setOpenModalDelete(true)
           }}
         />

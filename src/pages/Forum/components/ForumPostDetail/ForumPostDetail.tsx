@@ -13,6 +13,9 @@ import {
   postStateSelector,
 } from '@store/index'
 import ModalConfirm from '@components/ModalConfirm'
+import ModalDetailPost from '@components/ModalDetailPost'
+import VisibilityIcon from '@mui/icons-material/Visibility'
+import { IPost } from '@interfaces/IPost'
 
 interface Props {}
 
@@ -20,11 +23,21 @@ const ForumPostDetail: FC<Props> = (): JSX.Element => {
   const { setNotifySetting } = useStoreActions(notifyActionSelector)
   const { setForumDetail } = useStoreActions(forumActionSelector)
   const { forumDetail } = useStoreState(forumStateSelector)
-  const { deletePost, setIsDeletePostSuccess } = useStoreActions(postActionSelector)
+  const { deletePost, setIsDeletePostSuccess, getPostById } =
+    useStoreActions(postActionSelector)
   const { messageErrorPost, isDeletePostSuccess } = useStoreState(postStateSelector)
   const [loading, setLoading] = useState<boolean>(false)
   const [openModalDelete, setOpenModalDelete] = useState(false)
-  const [rowSelected, setRowSelected] = useState<string>('')
+  const [openModalPostDetail, setOpenModalPostDetail] = useState<boolean>(false)
+  const [rowSelected, setRowSelected] = useState<IPost | null>(null)
+
+  const getPostByIdPage = async (id: string) => {
+    const res = await getPostById(id)
+    if (res) {
+      setRowSelected(res)
+      setOpenModalPostDetail(true)
+    }
+  }
 
   const [sortModel, setSortModel] = useState<GridSortModel>([
     {
@@ -38,23 +51,25 @@ const ForumPostDetail: FC<Props> = (): JSX.Element => {
   }, [])
 
   const handleDeletePost = async () => {
-    setLoading(true)
-    const res = await deletePost(rowSelected)
-    if (res) {
-      setNotifySetting({
-        show: true,
-        status: 'success',
-        message: 'Delete post successful',
-      })
-      if (forumDetail !== null) {
-        const newData = forumDetail?.posts.filter((item) => {
-          return item?.id !== rowSelected
+    if (rowSelected) {
+      setLoading(true)
+      const res = await deletePost(rowSelected.id)
+      if (res) {
+        setNotifySetting({
+          show: true,
+          status: 'success',
+          message: 'Delete post successful',
         })
-        setForumDetail({ ...forumDetail, posts: newData })
+        if (forumDetail !== null) {
+          const newData = forumDetail?.posts.filter((item) => {
+            return item?.id !== rowSelected.id
+          })
+          setForumDetail({ ...forumDetail, posts: newData })
+        }
+        setOpenModalDelete(false)
       }
-      setOpenModalDelete(false)
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   useEffect(() => {
@@ -137,13 +152,21 @@ const ForumPostDetail: FC<Props> = (): JSX.Element => {
       sortable: false,
       disableSelectionOnClick: false,
       renderCell: (params: GridRenderCellParams<any, any>) => (
-        <DeleteIcon
-          sx={{ color: '#d32f2f', cursor: 'pointer' }}
-          onClick={() => {
-            setRowSelected(params.row.id)
-            setOpenModalDelete(true)
-          }}
-        />
+        <>
+          <VisibilityIcon
+            sx={{ cursor: 'pointer', color: '#1278ccf0', mr: 1 }}
+            onClick={() => {
+              getPostByIdPage(params.row.id)
+            }}
+          />
+          <DeleteIcon
+            sx={{ color: '#d32f2f', cursor: 'pointer' }}
+            onClick={() => {
+              setRowSelected(params.row)
+              setOpenModalDelete(true)
+            }}
+          />
+        </>
       ),
     },
   ]
@@ -167,6 +190,14 @@ const ForumPostDetail: FC<Props> = (): JSX.Element => {
           handleDelete={handleDeletePost}
         />
       ) : null}
+
+      {openModalPostDetail && (
+        <ModalDetailPost
+          item={rowSelected}
+          open={openModalPostDetail}
+          setOpen={setOpenModalPostDetail}
+        />
+      )}
     </>
   )
 }

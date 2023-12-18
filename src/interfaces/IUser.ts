@@ -25,6 +25,7 @@ export interface IUserForum {
     dateOfBirth: string
     gender: string
     avatarUrl: string
+    isMod?: boolean
 }
 
 export interface IUserForumResponse {

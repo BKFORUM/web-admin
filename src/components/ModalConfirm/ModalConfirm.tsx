@@ -22,9 +22,10 @@ interface IProps {
   open: boolean
   handleClose: React.Dispatch<React.SetStateAction<boolean>>
   handleDelete: () => Promise<void>
+  title?: string
 }
 
-export default function ModalConfirm({ open, handleClose, handleDelete }: IProps) {
+export default function ModalConfirm({ open, handleClose, handleDelete, title }: IProps) {
   return (
     <div>
       <Modal
@@ -48,7 +49,7 @@ export default function ModalConfirm({ open, handleClose, handleDelete }: IProps
               sx={{ textAlign: 'center' }}
               variant='h6'
               component='h2'>
-              Are you sure you want to delete?
+              {title ? title : 'Are you sure you want to delete?'}
             </Typography>
             <Box
               id='modal-modal-description'

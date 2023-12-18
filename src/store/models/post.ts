@@ -1,5 +1,7 @@
 import { persist, action, Action, Thunk, thunk } from "easy-peasy";
-import { deletePost, getAllPost } from "../../services/post.service";
+import { deletePost, getAllCommentPost, getAllPost, getAllReplyByCommentId, getPostById, postImage } from "../../services/post.service";
+import { IParams } from "@interfaces/IParameter";
+import { ICountReply } from "@interfaces/IPost";
 
 export interface IPostModel {
     //MessageError
@@ -15,6 +17,28 @@ export interface IPostModel {
     isDeletePostSuccess: boolean;
     setIsDeletePostSuccess: Action<IPostModel, boolean>;
     deletePost: Thunk<IPostModel, string>;
+
+    //getAllCommentPost
+    isGetAllCommentPostSuccess: boolean;
+    setIsGetAllCommentPostSuccess: Action<IPostModel, boolean>;
+    getAllCommentPost: Thunk<IPostModel, IParams>;
+
+    //getPostById
+    isGetPostByIdSuccess: boolean;
+    setIsGetPostByIdSuccess: Action<IPostModel, boolean>;
+    getPostById: Thunk<IPostModel, string>;
+
+    //PostImage
+    isPostImageSuccess: boolean;
+    setIsPostImageSuccess: Action<IPostModel, boolean>;
+    postImage: Thunk<IPostModel, any>;
+
+    //getAllReplyByCommentId
+    isGetAllReplyByCommentIdSuccess: boolean;
+    setIsGetAllReplyByCommentIdSuccess: Action<IPostModel, boolean>;
+    countReplyByCommentId: ICountReply[];
+    setCountReplyByCommentId: Action<IPostModel, ICountReply[]>;
+    getAllReplyByCommentId: Thunk<IPostModel, IParams>;
 }
 
 export const postModel: IPostModel = persist({
@@ -24,7 +48,7 @@ export const postModel: IPostModel = persist({
         state.messageErrorPost = payload;
     }),
 
-    //GetAllFaculty
+    //GetAllPost
     isGetAllPostSuccess: true,
     setIsGetAllPostSuccess: action((state, payload) => {
         state.isGetAllPostSuccess = payload;
@@ -54,6 +78,79 @@ export const postModel: IPostModel = persist({
             })
             .catch((error) => {
                 actions.setIsDeletePostSuccess(false)
+                actions.setMessageErrorPost(error?.response?.data?.message)
+            });
+    }),
+
+    //GetAllCommentPost
+    isGetAllCommentPostSuccess: true,
+    setIsGetAllCommentPostSuccess: action((state, payload) => {
+        state.isGetAllCommentPostSuccess = payload;
+    }),
+    getAllCommentPost: thunk(async (actions, payload,) => {
+        return getAllCommentPost(payload)
+            .then(async (res) => {
+                actions.setIsGetAllCommentPostSuccess(true)
+                return res.data;
+            })
+            .catch((error) => {
+                actions.setIsGetAllCommentPostSuccess(false)
+                actions.setMessageErrorPost(error?.response?.data?.message)
+            });
+    }),
+
+    //GetPostById
+    isGetPostByIdSuccess: true,
+    setIsGetPostByIdSuccess: action((state, payload) => {
+        state.isGetPostByIdSuccess = payload;
+    }),
+    getPostById: thunk(async (actions, payload,) => {
+        return getPostById(payload)
+            .then(async (res) => {
+                actions.setIsGetPostByIdSuccess(true)
+                return res.data;
+            })
+            .catch((error) => {
+                actions.setIsGetPostByIdSuccess(false)
+                actions.setMessageErrorPost(error?.response?.data?.message)
+            });
+    }),
+
+    //PostImage
+    isPostImageSuccess: true,
+    setIsPostImageSuccess: action((state, payload) => {
+        state.isPostImageSuccess = payload;
+    }),
+    postImage: thunk(async (actions, payload) => {
+        return postImage(payload)
+            .then(async (res) => {
+                actions.setIsPostImageSuccess(true)
+                return res.data;
+            })
+            .catch((error) => {
+                console.log(error)
+                actions.setIsPostImageSuccess(false)
+                actions.setMessageErrorPost(error?.response?.data?.message)
+            });
+    }),
+
+    //GetAllReplyByCommentId
+    isGetAllReplyByCommentIdSuccess: true,
+    setIsGetAllReplyByCommentIdSuccess: action((state, payload) => {
+        state.isGetAllReplyByCommentIdSuccess = payload;
+    }),
+    countReplyByCommentId: [],
+    setCountReplyByCommentId: action((state, payload) => {
+        state.countReplyByCommentId = payload;
+    }),
+    getAllReplyByCommentId: thunk(async (actions, payload,) => {
+        return getAllReplyByCommentId(payload)
+            .then(async (res) => {
+                actions.setIsGetAllReplyByCommentIdSuccess(true)
+                return res.data;
+            })
+            .catch((error) => {
+                actions.setIsGetAllReplyByCommentIdSuccess(false)
                 actions.setMessageErrorPost(error?.response?.data?.message)
             });
     }),

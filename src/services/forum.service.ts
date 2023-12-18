@@ -70,4 +70,12 @@ const deleteUserFromForum = (data: any) => {
     });
 }
 
+// const getAllEventForum = (params: any) => {
+//     return BaseURL({
+//         url: `/events/`,
+//         method: "GET",
+//         params,
+//     });
+// }
+
 export { getAllForum, addForum, addUserToForum, getAllTopic, editForum, deleteForum, getForumById, updateStatusForum, deleteUserFromForum }

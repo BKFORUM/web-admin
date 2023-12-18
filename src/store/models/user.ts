@@ -1,5 +1,5 @@
 import { persist, action, Action, Thunk, thunk } from "easy-peasy";
-import { addUser, editUser, getAllForumByUser, getAllUser, getUserById } from "../../services/user.service";
+import { addUser, editUser, getAllForumByUser, getAllUser, getUserById, resetPassword } from "../../services/user.service";
 import { IUser } from "@interfaces/IUser";
 
 export interface IUserModel {
@@ -31,6 +31,9 @@ export interface IUserModel {
     isGetAllForumByUserSuccess: boolean;
     setIsGetAllForumByUserSuccess: Action<IUserModel, boolean>;
     getAllForumByUser: Thunk<IUserModel, string>;
+
+    //resetPassword
+    resetPassword: Thunk<IUserModel, string>;
 }
 
 export const userModel: IUserModel = persist({
@@ -121,6 +124,16 @@ export const userModel: IUserModel = persist({
             })
             .catch((error) => {
                 actions.setIsGetAllUserSuccess(false)
+                actions.setMessageErrorUser(error?.response?.data?.message)
+            });
+    }),
+
+    resetPassword: thunk(async (actions, payload) => {
+        return resetPassword(payload)
+            .then(async (res) => {
+                return res;
+            })
+            .catch((error) => {
                 actions.setMessageErrorUser(error?.response?.data?.message)
             });
     }),

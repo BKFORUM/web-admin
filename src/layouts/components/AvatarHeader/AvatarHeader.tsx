@@ -12,6 +12,8 @@ const AvatarHeader: FC<Props> = (): JSX.Element => {
   const [open, setOpen] = useState(false)
   const user = JSON.parse(String(localStorage.getItem('user')))
 
+  console.log(user)
+
   let elementRef: any = useClickOutside(() => {
     if (open) {
       setOpen(false)
@@ -35,12 +37,12 @@ const AvatarHeader: FC<Props> = (): JSX.Element => {
             src={test}
             alt='avatar'
           />
-            <span
-              title='online'
-              className='flex justify-center absolute -bottom-0.5 ltr:right-2 rtl:left-2 text-center bg-green-500 border border-white w-3 h-3 rounded-full'></span>
+          <span
+            title='online'
+            className='flex justify-center absolute -bottom-0.5 ltr:right-2 rtl:left-2 text-center bg-green-500 border border-white w-3 h-3 rounded-full'></span>
         </div>
         <span className='hidden md:block ltr:ml-1 rtl:mr-1 self-center font-semibold text-base'>
-          {user?.name}
+          {user.name}
         </span>
       </div>
       <Transition

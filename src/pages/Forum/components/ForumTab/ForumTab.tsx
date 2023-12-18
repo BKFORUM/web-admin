@@ -89,8 +89,6 @@ const ForumTab: FC<Props> = (): JSX.Element => {
         ...item,
         tag: paginationModel.page * paginationModel.pageSize + index + 1,
         topicIds: item?.topics.map((topic: ITopic) => topic.id),
-        total_members: 40,
-        event: 40,
       }))
       setRows(data)
       setLoading(false)
@@ -225,7 +223,7 @@ const ForumTab: FC<Props> = (): JSX.Element => {
       ),
     },
     {
-      field: 'total_members',
+      field: 'totalUsers',
       headerName: 'Total Member',
       type: 'number',
       minWidth: 100,
@@ -233,6 +231,9 @@ const ForumTab: FC<Props> = (): JSX.Element => {
       align: 'left',
       headerAlign: 'left',
       hideable: false,
+      renderCell: (params: GridRenderCellParams<any, number>) => (
+        <a className=''>{params.row._count.users}</a>
+      ),
     },
     {
       field: 'event',
@@ -245,7 +246,7 @@ const ForumTab: FC<Props> = (): JSX.Element => {
       disableColumnMenu: true,
       hideable: false,
       renderCell: (params: GridRenderCellParams<any, number>) => (
-        <a className='text-blue-700 cursor-pointer'>{params.row.event}</a>
+        <a className=''>{params.row._count.events}</a>
       ),
     },
     {
@@ -304,6 +305,7 @@ const ForumTab: FC<Props> = (): JSX.Element => {
           <SearchInput
             value={inputSearch}
             setValue={handleChangeSearch}
+            width='300px'
           />
           <Button
             typeButton='blue'

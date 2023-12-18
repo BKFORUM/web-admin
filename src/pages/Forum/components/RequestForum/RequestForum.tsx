@@ -95,11 +95,13 @@ function ActionsMenu({ params, isUpdate }: IActionMenu) {
         <div className={`lg:flex gap-2 xs:hidden`}>
           <Button
             loading={loading}
+            onClick={handleApproveClick}
             typeButton='approve'>
             Approve
           </Button>
           <Button
             loading={loading}
+            onClick={handleRejectClick}
             typeButton='reject'>
             Reject
           </Button>
@@ -257,6 +259,8 @@ const RequestForum: FC<Props> = (): JSX.Element => {
       align: 'left',
       headerAlign: 'left',
       hideable: false,
+      disableColumnMenu: true,
+      sortable: false,
       renderCell: (params: GridRenderCellParams<any, string>) =>
         params.row.topics.length > 2 ? (
           <div className='flex'>
@@ -329,6 +333,7 @@ const RequestForum: FC<Props> = (): JSX.Element => {
         <SearchInput
           value={inputSearch}
           setValue={handleChangeSearch}
+          width='300px'
         />
       </div>
 

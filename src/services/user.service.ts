@@ -39,4 +39,11 @@ const getAllForumByUser = (id: string) => {
     });
 }
 
-export { getAllUser, addUser, getUserById, editUser, getAllForumByUser }
+const resetPassword = (id: string) => {
+    return BaseURL({
+        url: `/users/${id}/reset-password`,
+        method: "PUT",
+    });
+}
+
+export { getAllUser, addUser, getUserById, editUser, getAllForumByUser, resetPassword }
