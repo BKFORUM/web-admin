@@ -58,9 +58,7 @@ BaseURL.interceptors.response.use(
 
 const refreshToken = async () => {
   try {
-    // const auth: any = JSON.parse(String(localStorage.getItem("auth")));
     const user: any = JSON.parse(String(localStorage.getItem("user")));
-
     const resp = await BaseURL.get("/auth/refresh", {
       headers: {
         Authorization: `Bearer ${user?.refresh_token}`
@@ -68,8 +66,9 @@ const refreshToken = async () => {
     })
     return resp;
   } catch (e) {
+    console.log(11111)
     console.log("Error", e);
-    localStorage.removeItem('user ')
+    localStorage.removeItem('user')
   }
 };
 

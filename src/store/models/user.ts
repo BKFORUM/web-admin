@@ -1,5 +1,5 @@
 import { persist, action, Action, Thunk, thunk } from "easy-peasy";
-import { addUser, editUser, getAllForumByUser, getAllUser, getUserById, resetPassword } from "../../services/user.service";
+import { addUser, editUser, getAllForumByUser, getAllUser, getUserById, importFileUser, resetPassword } from "../../services/user.service";
 import { IUser } from "@interfaces/IUser";
 
 export interface IUserModel {
@@ -34,6 +34,12 @@ export interface IUserModel {
 
     //resetPassword
     resetPassword: Thunk<IUserModel, string>;
+
+    //importFileUser
+    isImportFileUserSuccess: boolean;
+    setIsImportFileUserSuccess: Action<IUserModel, boolean>;
+    importFileUser: Thunk<IUserModel, any>;
+
 }
 
 export const userModel: IUserModel = persist({
@@ -137,4 +143,23 @@ export const userModel: IUserModel = persist({
                 actions.setMessageErrorUser(error?.response?.data?.message)
             });
     }),
+
+    //
+    isImportFileUserSuccess: true,
+    setIsImportFileUserSuccess: action((state, payload) => {
+        state.isImportFileUserSuccess = payload;
+    }),
+
+    importFileUser: thunk(async (actions, payload) => {
+        return importFileUser(payload)
+            .then(async (res) => {
+                actions.setIsImportFileUserSuccess(true)
+                return res;
+            })
+            .catch((error) => {
+                actions.setIsImportFileUserSuccess(false)
+                actions.setMessageErrorUser(error?.response?.data?.message)
+            });
+    }),
+
 })
