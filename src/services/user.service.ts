@@ -1,5 +1,6 @@
 import { IUser } from "@interfaces/IUser";
 import BaseURL from "@utils/api/baseURL";
+import BaseURLUpLoadFile from "@utils/api/baseURLUpLoadFile";
 
 const getAllUser = (params: any) => {
     return BaseURL({
@@ -46,4 +47,12 @@ const resetPassword = (id: string) => {
     });
 }
 
-export { getAllUser, addUser, getUserById, editUser, getAllForumByUser, resetPassword }
+const importFileUser = (data: any) => {
+    return BaseURLUpLoadFile({
+        url: `/users/import`,
+        method: "POST",
+        data,
+    });
+}
+
+export { getAllUser, addUser, getUserById, editUser, getAllForumByUser, resetPassword, importFileUser }

@@ -3,7 +3,7 @@ import { GridRenderCellParams, GridSortModel } from '@mui/x-data-grid'
 import { FC, useCallback, useEffect, useState } from 'react'
 import Table from '@components/Table/Table'
 import AddIcon from '@mui/icons-material/Add'
-// import DeleteIcon from '@mui/icons-material/Delete'
+import { HiDocumentAdd } from 'react-icons/hi'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import Button from '@components/Button/Button'
 import SearchInput from '@components/SearchInput'
@@ -19,10 +19,20 @@ interface Props {}
 const UserManagement: FC<Props> = (): JSX.Element => {
   const navigate = useNavigate()
   const { setNotifySetting } = useStoreActions(notifyActionSelector)
-  const { getAllUser, setIsGetAllUserSuccess, addUser, setIsAddUserSuccess } =
-    useStoreActions(userActionSelector)
-  const { messageErrorUser, isGetAllUserSuccess, isAddUserSuccess } =
-    useStoreState(userStateSelector)
+  const {
+    getAllUser,
+    setIsGetAllUserSuccess,
+    addUser,
+    setIsAddUserSuccess,
+    importFileUser,
+    setIsImportFileUserSuccess,
+  } = useStoreActions(userActionSelector)
+  const {
+    messageErrorUser,
+    isGetAllUserSuccess,
+    isAddUserSuccess,
+    isImportFileUserSuccess,
+  } = useStoreState(userStateSelector)
   const [inputSearch, setInputSearch] = useState<string>('')
   const [rowsData, setRows] = useState<IUser[]>([])
   const [rowTotal, setRowTotal] = useState(0)
@@ -87,6 +97,13 @@ const UserManagement: FC<Props> = (): JSX.Element => {
     }
   }, [isAddUserSuccess])
 
+  useEffect(() => {
+    if (!isImportFileUserSuccess) {
+      setNotifySetting({ show: true, status: 'error', message: messageErrorUser })
+      setIsImportFileUserSuccess(true)
+    }
+  }, [isImportFileUserSuccess])
+
   const handleSortModelChange = useCallback((newSortModel: GridSortModel) => {
     setSortModel(newSortModel)
   }, [])
@@ -109,6 +126,26 @@ const UserManagement: FC<Props> = (): JSX.Element => {
       getAllUserPage()
       setLoading(false)
     } else {
+      setLoading(false)
+    }
+  }
+
+  const handleImportFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (files && files.length > 0 && files[0] !== null) {
+      const file = files[0]
+      const formData = new FormData()
+      formData.append(`file`, file)
+      setLoading(true)
+      const res = await importFileUser(formData)
+      if (res) {
+        setNotifySetting({
+          show: true,
+          status: 'success',
+          message: 'Import users successful',
+        })
+        setPaginationModel({ page: 0, pageSize: 10 })
+      }
       setLoading(false)
     }
   }
@@ -242,7 +279,7 @@ const UserManagement: FC<Props> = (): JSX.Element => {
 
   return (
     <>
-      <div>
+      <div className='sticky top-20'>
         <div className='flex justify-between items-center '>
           <div className='flex item-center justify-center'>
             <h4 className='font-bold text-xl my-auto mr-6'>Users</h4>
@@ -252,17 +289,39 @@ const UserManagement: FC<Props> = (): JSX.Element => {
               width='300px'
             />
           </div>
-          <Button
-            typeButton='blue'
-            onClick={() => {
-              setOpenModalEdit(true)
-              setRowSelected(undefined)
-            }}>
-            <div className='flex items-center gap-2'>
-              <AddIcon />
-              <span>Create</span>
+
+          <div className='flex items-center gap-4'>
+            <div>
+              <label
+                htmlFor='importExcel'
+                className={`${
+                  loading && 'pointer-events-none'
+                } cursor-pointer flex items-center gap-1.5 bg-[#3367d6] hover:bg-[#1a55d1] text-white py-2 px-4 border border-[#3367d6] rounded shadow `}>
+                <HiDocumentAdd className='h-5 w-5' />
+
+                <span>Import</span>
+              </label>
+              <input
+                id='importExcel'
+                type='file'
+                accept='.xlsx'
+                multiple={false}
+                className='hidden'
+                onChange={handleImportFile}
+              />
             </div>
-          </Button>
+            <Button
+              typeButton='blue'
+              onClick={() => {
+                setOpenModalEdit(true)
+                setRowSelected(undefined)
+              }}>
+              <div className='flex items-center gap-2 '>
+                <AddIcon />
+                <span>Create</span>
+              </div>
+            </Button>
+          </div>
         </div>
 
         <div className='mt-3 w-full overflow-x-hidden'>
