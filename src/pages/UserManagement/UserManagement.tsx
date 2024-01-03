@@ -122,12 +122,11 @@ const UserManagement: FC<Props> = (): JSX.Element => {
         status: 'success',
         message: 'Add user successful',
       })
-      setOpenModalEdit(false)
-      getAllUserPage()
-      setLoading(false)
-    } else {
+
       setLoading(false)
     }
+    setOpenModalEdit(false)
+    setLoading(false)
   }
 
   const handleImportFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
