@@ -1,3 +1,4 @@
+import { IEvent } from "./IEvent"
 import { IPostForum } from "./IPost"
 import { ITopic } from "./ITopics"
 import { IModerator, IUserForum } from "./IUser"
@@ -59,4 +60,5 @@ export interface IForumDetail {
     users: [{
         user: IUserForum
     }]
+    events: IEvent[]
 }

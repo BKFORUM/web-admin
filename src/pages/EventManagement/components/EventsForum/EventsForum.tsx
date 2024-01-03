@@ -136,7 +136,7 @@ const EventsForum: FC<Props> = (): JSX.Element => {
       headerName: 'Name',
       flex: 2,
       minWidth: 150,
-      sortable: false,
+      sortable: true,
       editable: false,
       align: 'left',
       headerAlign: 'left',

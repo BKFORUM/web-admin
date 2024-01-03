@@ -126,7 +126,7 @@ const ViewForum: FC<Props> = (): JSX.Element => {
                   className={`text-lg text-[#3E9FDA] font-bold ${
                     tab === 'events' && 'text-white'
                   }`}>
-                  2
+                  {forumDetail?.events.length}
                 </span>
                 <span className={`${tab === 'events' && 'text-white'}`}>Events</span>
               </div>

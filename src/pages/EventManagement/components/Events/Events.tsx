@@ -107,6 +107,12 @@ const Events: FC<Props> = (): JSX.Element => {
     if (!isGetAllEventSuccess) {
       setNotifySetting({ show: true, status: 'error', message: messageError })
       setIsGetAllEventSuccess(true)
+      setSortModel([
+        {
+          field: 'startAt',
+          sort: 'asc',
+        },
+      ])
     }
   }, [isGetAllEventSuccess])
 
@@ -254,7 +260,7 @@ const Events: FC<Props> = (): JSX.Element => {
       headerName: 'Name',
       flex: 2,
       minWidth: 150,
-      sortable: false,
+      sortable: true,
       editable: false,
       align: 'left',
       headerAlign: 'left',

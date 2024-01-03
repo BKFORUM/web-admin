@@ -245,6 +245,7 @@ const ForumTab: FC<Props> = (): JSX.Element => {
       headerAlign: 'left',
       disableColumnMenu: true,
       hideable: false,
+      sortable: false,  
       renderCell: (params: GridRenderCellParams<any, number>) => (
         <a className=''>{params.row._count.events}</a>
       ),
