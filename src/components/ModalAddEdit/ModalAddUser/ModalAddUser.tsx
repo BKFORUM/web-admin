@@ -106,11 +106,7 @@ const ModalAddUser: FC<Props<IUserDetail>> = ({
     address: rowSelected?.address || '',
   }
 
-  const {
-    handleSubmit,
-    control,
-    formState: { errors },
-  } = useForm<IUser>({
+  const { handleSubmit, control } = useForm<IUser>({
     defaultValues: defaultValues,
     resolver: yupResolver(schema),
   })
@@ -133,11 +129,7 @@ const ModalAddUser: FC<Props<IUserDetail>> = ({
       <div>
         <form
           action=''
-          className={`flex flex-col gap-2 ${
-            !!errors && Object.keys(errors).length > 2
-              ? 'h-[500px] overflow-scroll '
-              : 'h-auto'
-          }`}
+          className={`flex flex-col gap-2 h-[500px] overflow-scroll `}
           onSubmit={handleSubmit(onSubmit)}>
           <div className='flex flex-col gap-1'>
             <label

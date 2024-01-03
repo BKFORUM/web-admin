@@ -158,7 +158,13 @@ export const userModel: IUserModel = persist({
             })
             .catch((error) => {
                 actions.setIsImportFileUserSuccess(false)
-                actions.setMessageErrorUser(error?.response?.data?.message)
+                var message;
+                if (Array.isArray(error?.response?.data?.message)) {
+                    message = error.response?.data?.error
+                } else {
+                    message = error?.response?.data?.message
+                }
+                actions.setMessageErrorUser(message)
             });
     }),
 

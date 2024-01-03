@@ -26,8 +26,8 @@ interface Image {
 }
 
 const schema = yup.object().shape({
-  displayName: yup.string().required('Name is valid!'),
-  location: yup.string().required('Location of birth is valid!'),
+  displayName: yup.string().required('Name is required!'),
+  location: yup.string().required('Location of birth is required!'),
   startAt: yup
     .string()
     .required('Start Time is required!')
@@ -60,7 +60,7 @@ const schema = yup.object().shape({
         return !startAt || new Date(value) > new Date(startAt)
       },
     }),
-  content: yup.string().required('Description is valid!'),
+  content: yup.string().required('Description is required!'),
 })
 
 const ModalAddEditEvent: FC<Props<IEvent>> = ({
