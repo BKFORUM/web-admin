@@ -37,9 +37,9 @@ const optionTypes: IOption[] = [
 ]
 
 const schema = yup.object().shape({
-  name: yup.string().required('Name không được để trống !!!'),
-  moderatorId: yup.string().required('Moderator không được để trống !!!'),
-  type: yup.string().required('Type không được để trống !!!'),
+  name: yup.string().required('Name is required'),
+  moderatorId: yup.string().required('Moderator is required'),
+  type: yup.string().required('Type is required'),
   topicIds: yup.array().when('type', {
     is: (val: string) => val === 'TOPIC',
     then: () =>
